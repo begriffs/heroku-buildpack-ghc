@@ -1,8 +1,5 @@
 #!/bin/bash
 
-# fail fast
-set -e
-
 # parse and derive params
 BUILD_DIR=$1
 CACHE_DIR=$2
@@ -17,7 +14,9 @@ if [ ! -e $CACHE_DIR/ghc-7.6.3 ]; then
 fi
 
 # Run installer if the ghc is not available
-if [ ! hash ghc ]; then
+hash ghc
+if [[ $? -ne 0 ]]; then
+  echo "-----> Installing GHC 7.6.3"
   cd $CACHE_DIR/ghc-7.6.3
   ./configure
   make install
