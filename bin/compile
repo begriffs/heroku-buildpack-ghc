@@ -1,0 +1,24 @@
+#!/bin/bash
+
+# fail fast
+set -e
+
+# parse and derive params
+BUILD_DIR=$1
+CACHE_DIR=$2
+
+mkdir -p $CACHE_DIR
+
+# Download GHC binaries if we do not have them yet
+if [ ! -e $CACHE_DIR/ghc-7.6.3 ]; then
+  GHC_URL="http://www.haskell.org/ghc/dist/7.6.3/ghc-7.6.3-x86_64-unknown-linux.tar.bz2"
+  echo "-----> Downloading GHC 7.6.3"
+  curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR
+fi
+
+# Run installer if the ghc is not available
+if [ ! hash ghc ]; then
+  cd $CACHE_DIR/ghc-7.6.3
+  ./configure
+  make install
+fi

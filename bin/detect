@@ -1,0 +1,3 @@
+#!/bin/bash
+
+echo Haskell; exit 0
