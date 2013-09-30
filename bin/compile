@@ -20,4 +20,6 @@ if [[ $? -ne 0 ]]; then
   cd $CACHE_DIR/ghc-7.6.3
   ./configure --prefix $BUILD_DIR/vendor/ghc-7.6.3
   make install
+
+  find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
 fi
