@@ -1,7 +1,5 @@
 #!/bin/sh
 
-echo <<EOF
----
-config_vars:
-  PATH: "vendor/ghc-7.6.3/bin:/usr/bin:/bin"
-EOF
+echo "---"
+echo "config_vars:"
+echo "  PATH: $PATH:/app/vendor/ghc-7.6.3/bin"
