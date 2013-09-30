@@ -3,3 +3,5 @@ echo <<EOF
 config_vars:
   PATH: "$PATH:/app/vendor/ghc-7.6.3/bin"
 EOF
+
+/app/vendor/ghc-7.6.3/bin/ghc-pkg recache
