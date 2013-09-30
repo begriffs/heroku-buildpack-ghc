@@ -22,4 +22,5 @@ if [[ $? -ne 0 ]]; then
   make install
 
   find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  ln -s /usr/lib/libgmp.so.3 /usr/lib/libgmp.so
 fi
