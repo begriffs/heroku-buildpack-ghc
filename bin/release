@@ -5,5 +5,5 @@ GHC_VER=7.6.3
 cat <<EOF
 ---
 config_vars:
-  PATH: $PATH:/app/vendor/ghc-$GHC_VER/bin
+  PATH: /app/vendor/ghc-$GHC_VER/bin
 EOF
