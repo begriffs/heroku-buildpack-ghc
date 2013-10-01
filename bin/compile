@@ -20,8 +20,8 @@ if [ ! -e $CACHE_DIR/patchelf-0.6 ]; then
 
   echo "-----> Building PatchElf 0.6"
   cd $CACHE_DIR/patchelf-0.6
-  ./configure
-  make
+  ./configure --prefix $BUILD_DIR/vendor/patchelf-0.6
+  make install
 fi
 
 # Run installer if the ghc is not available
@@ -36,9 +36,9 @@ if [[ $? -ne 0 ]]; then
   mkdir -p $BUILD_DIR/vendor/ghc-libs
   ln -s /usr/lib/libgmp.so.3 $BUILD_DIR/vendor/ghc-libs/libgmp.so
 
-  echo "-----> Preparing GHC to live in /app/vendor"
-  find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  # echo "-----> Preparing GHC to live in /app/vendor"
+  # find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
 
-  echo "-----> Patching GHC to find libgmp"
-  $CACHE_DIR/patchelf-0.6/src/patchelf --set-rpath /usr/lib:/app/vendor/ghc-libs $BUILD_DIR/vendor/ghc-7.6.3/bin/*.7.6.3
+  #echo "-----> Patching GHC to find libgmp"
+  #$CACHE_DIR/patchelf-0.6/src/patchelf --set-rpath /usr/lib:/app/vendor/ghc-libs $BUILD_DIR/vendor/ghc-7.6.3/bin/*.7.6.3
 fi
