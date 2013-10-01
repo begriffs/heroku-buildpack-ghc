@@ -37,7 +37,7 @@ if [[ $? -ne 0 ]]; then
   ln -s /usr/lib/libgmp.so.3 $BUILD_DIR/vendor/ghc-libs/libgmp.so
 
   echo "-----> Preparing GHC to live in /app/vendor"
-  find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  find $BUILD_DIR/vendor/ghc-7.6.3/bin -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
 
   echo "-----> Patching GHC to find libgmp"
   find $BUILD_DIR/vendor/ghc-7.6.3 -type f -executable -exec sh -c "file {} | grep -q ELF" \; -print | xargs -L 1 $CACHE_DIR/patchelf-0.6/src/patchelf --set-rpath /usr/lib:/app/vendor/ghc-libs
