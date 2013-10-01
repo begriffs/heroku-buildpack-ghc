@@ -6,5 +6,4 @@ cat <<EOF
 ---
 config_vars:
   PATH: $PATH:/app/vendor/ghc-$GHC_VER/bin
-  LD_LIBRARY_PATH: /app/vendor/ghc-libs
 EOF

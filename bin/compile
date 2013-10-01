@@ -15,6 +15,17 @@ if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR
 fi
 
+if [ ! -e $CACHE_DIR/patchelf-0.6 ]; then
+  PATCHELF_URL="http://hydra.nixos.org/build/1524660/download/2/patchelf-0.6.tar.bz2"
+  echo "-----> Downloading PatchElf 0.6"
+  curl -# -L "$PATCHELF_URL" | bunzip2 | tar x -C $CACHE_DIR
+fi
+
+echo "-----> Building PatchElf 0.6"
+cd $CACHE_DIR/patchelf-0.6
+./configure
+make install
+
 # Run installer if the ghc is not available
 hash ghc
 if [[ $? -ne 0 ]]; then
@@ -31,4 +42,7 @@ if [[ $? -ne 0 ]]; then
   find $BUILD_DIR/vendor/ghc-$GHC_VER/lib/ghc-$GHC_VER/package.conf.d -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
   $BUILD_DIR/vendor/ghc-$GHC_VER/bin/ghc-pkg recache
   find $BUILD_DIR/vendor/ghc-$GHC_VER/{lib,bin} -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+
+  echo "-----> Patching GHC to find libgmp"
+  find $BUILD_DIR/vendor/ghc-7.6.3 -type f -executable -exec sh -c "file {} | grep -q ELF" \; -print | xargs -L 1 $CACHE_DIR/patchelf-0.6/src/patchelf --set-rpath /usr/lib:/app/vendor/ghc-libs
 fi
