@@ -26,7 +26,6 @@ if [[ $? -ne 0 ]]; then
   echo "-----> Linking libgmp.so in an accessible place"
   mkdir -p $BUILD_DIR/vendor/ghc-libs
   ln -s /usr/lib/libgmp.so.3 $BUILD_DIR/vendor/ghc-libs/libgmp.so
-  export LD_LIBRARY_PATH=/app/usr/vendor/ghc-libs
 
   echo "-----> Preparing GHC to live in /app/vendor"
   find $BUILD_DIR/vendor/ghc-$GHC_VER/lib/ghc-$GHC_VER/package.conf.d -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
