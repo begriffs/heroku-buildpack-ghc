@@ -30,5 +30,5 @@ if [[ $? -ne 0 ]]; then
   echo "-----> Preparing GHC to live in /app/vendor"
   find $BUILD_DIR/vendor/ghc-$GHC_VER/lib/ghc-$GHC_VER/package.conf.d -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
   $BUILD_DIR/vendor/ghc-$GHC_VER/bin/ghc-pkg recache
-  find $BUILD_DIR/vendor/ghc-$GHC_VER -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  find $BUILD_DIR/vendor/ghc-$GHC_VER/{lib,bin} -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
 fi
