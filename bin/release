@@ -1,5 +1,5 @@
 echo <<EOF
 ---
 config_vars:
-  PATH: "$PATH:/app/vendor/ghc-7.6.3/bin"
+  PATH: $PATH:/app/vendor/ghc-7.6.3/bin
 EOF
