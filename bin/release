@@ -1,5 +1,3 @@
-/app/vendor/ghc-7.6.3/bin/ghc-pkg recache > /dev/null
-
 echo <<EOF
 ---
 config_vars:
