@@ -4,7 +4,7 @@
 BUILD_DIR=$1
 CACHE_DIR=$2
 
-export GHC_VER=7.6.3
+GHC_VER=7.6.3
 
 mkdir -p $CACHE_DIR
 

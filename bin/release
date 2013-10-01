@@ -1,5 +1,7 @@
 #!/bin/bash
 
+GHC_VER=7.6.3
+
 cat <<EOF
 ---
 config_vars:
