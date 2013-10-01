@@ -4,21 +4,23 @@
 BUILD_DIR=$1
 CACHE_DIR=$2
 
+export GHC_VER=7.6.3
+
 mkdir -p $CACHE_DIR
 
 # Download GHC binaries if we do not have them yet
-if [ ! -e $CACHE_DIR/ghc-7.6.3 ]; then
-  GHC_URL="http://www.haskell.org/ghc/dist/7.6.3/ghc-7.6.3-x86_64-unknown-linux.tar.bz2"
-  echo "-----> Downloading GHC 7.6.3"
+if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
+  GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux.tar.bz2"
+  echo "-----> Downloading GHC $GHC_VER"
   curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR
 fi
 
 # Run installer if the ghc is not available
 hash ghc
 if [[ $? -ne 0 ]]; then
-  echo "-----> Installing GHC 7.6.3"
-  cd $CACHE_DIR/ghc-7.6.3
-  ./configure --prefix $BUILD_DIR/vendor/ghc-7.6.3
+  echo "-----> Installing GHC $GHC_VER"
+  cd $CACHE_DIR/ghc-$GHC_VER
+  ./configure --prefix $BUILD_DIR/vendor/ghc-$GHC_VER
   make install
 
   echo "-----> Linking libgmp.so in an accessible place"
@@ -27,7 +29,7 @@ if [[ $? -ne 0 ]]; then
   export LD_LIBRARY_PATH=/app/usr/vendor/ghc-libs
 
   echo "-----> Preparing GHC to live in /app/vendor"
-  find $BUILD_DIR/vendor/ghc-7.6.3/lib/ghc-7.6.3/package.conf.d -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
-  $BUILD_DIR/vendor/ghc-7.6.3/bin/ghc-pkg recache
-  find $BUILD_DIR/vendor/ghc-7.6.3 -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  find $BUILD_DIR/vendor/ghc-$GHC_VER/lib/ghc-$GHC_VER/package.conf.d -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
+  $BUILD_DIR/vendor/ghc-$GHC_VER/bin/ghc-pkg recache
+  find $BUILD_DIR/vendor/ghc-$GHC_VER -type f | xargs perl -pi -e "s%$BUILD_DIR%/app%g"
 fi
