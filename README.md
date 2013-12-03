@@ -3,6 +3,8 @@
 
 ## Deploy Haskell apps to Heroku
 
+<br />
+
 Publish Haskell apps to the web with a few commands. This buildpack
 provides GHC 7.6.3 and Cabal 1.18 for your app, and maintains up a Cabal
 sandbox for app dependencies.
