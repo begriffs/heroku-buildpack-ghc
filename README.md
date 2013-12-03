@@ -5,9 +5,9 @@
 
 <br />
 
-This buildpack provides the latest stable GHC binaries and supports
-frameworks like Yesod, Snap, and Happstack. Putting Haskell web
-applications online should be easy, and now it is. Try it for yourself.
+This buildpack supports frameworks like Yesod, Snap, and Happstack with
+the latest stable GHC binaries and. Putting Haskell web applications
+online should be easy, and now it is. Try it for yourself.
 
 ### Example: deploying a Snap app
 
@@ -40,6 +40,13 @@ git push heroku master
 **The first deploy is very slow** as the environment downloads and
 bootstraps. Subsequent deploys use cached binaries and go much faster.
 
+### Interacting with a running app
+
+```sh
+heroku run bash         # shell access
+heroku run cabal repl   # Haskell repl with all app modules loaded
+```
+
 ### Benefits of this buildpack
 
 * Latest binaries: GHC 7.6.3, Cabal 1.18.0.2
@@ -50,7 +57,7 @@ bootstraps. Subsequent deploys use cached binaries and go much faster.
 ### Contributing
 
 There are a number of ways to improve this buildpack. Please see the
-project [issues](issues) for ideas.
+Github issues for ideas.
 
 In order to contribute to the build script it will help to understand
 how Heroku's deployment process works, and how that affects GHC. Heroku
@@ -79,8 +86,10 @@ working directory, use GHC there, then copy that installation to the
 build directory which will be renamed in the deployed application and
 not notice it has been moved.
 
-Most of the stuff in the script is just this juggling, along with
-caching as much as it can.
+GHC is also sensitive to having `libgmp` named just right. We don't
+have privileges to adjust `/usr/lib` in the deployed app so we create a
+symbolic link in a place we are permitted and set linker variables in
+the shell so that everything can build.
 
 ### Thanks
 
