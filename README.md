@@ -12,8 +12,9 @@ online should be easy, and now it is. Try it for yourself.
 ### Example: deploying a Snap app
 
 Here's how to go from zero to "hello world" on Heroku. You'll need to
-install the [Haskell Platform](http://www.haskell.org/platform/) on your
-local machine, then do this:
+install the [Haskell Platform](http://www.haskell.org/platform/) and
+the [Heroku Toolbelt](https://toolbelt.herokuapp.com/) on your local
+machine, then do this:
 
 ```sh
 # Generate a barebones snap app called snapdemo
