@@ -92,6 +92,33 @@ have privileges to adjust `/usr/lib` in the deployed app so we create a
 symbolic link in a place we are permitted and set linker variables in
 the shell so that everything can build.
 
+### Building new binaries for Heroku
+
+As new versions of GHC and Cabal are released we can build them for
+Heroku so the buildpack won't have to. The buildpack can build from
+official sources but it takes longer.
+
+Adjust the `GHC_VERSION` and `CABAL_VERSION` in `bin/compile` and
+`bin/release` then deploy an app. It will build the new binaries. You
+have to copy them to S3. Do it like this:
+
+```sh
+heroku run bash
+# now SSH'd into the server
+
+cd /app/vendor
+
+curl -L http://softlayer-ams.dl.sourceforge.net/project/s3tools/s3cmd/1.5.0-alpha1/s3cmd-1.5.0-alpha1.tar.gz | tar zx
+s3cmd-1.5.0-alpha1/s3cmd --configure
+# ^^^ answer the configuration questions
+
+tar zcf heroku-ghc-[VERSION].tar.gz ghc-[VERSION]/
+tar zcf heroku-cabal-install-[VERSION].tar.gz cabal-install-[VERSION]/
+
+s3cmd-1.5.0-alpha1/s3cmd put heroku-ghc-[VERSION].tar.gz s3://[BUCKET]
+s3cmd-1.5.0-alpha1/s3cmd put heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
+```
+
 ### Thanks
 
 Thanks to Brian McKenna and others for their work on
