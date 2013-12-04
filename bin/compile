@@ -80,7 +80,9 @@ fi
 
 ########## project build ###########################################
 
+cd $BUILD_DIR
 cabal sandbox init --sandbox $WORKING_HOME/.cabal_sandbox
+
 if [ -e $CACHE_DIR/.cabal_sandbox ]; then
   echo "-----> Restoring cached cabal packages"
   rm -fr $WORKING_HOME/.cabal_sandbox
