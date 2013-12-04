@@ -16,7 +16,7 @@ mkdir -p $WORKING_HOME/vendor
 
 ########## GHC #####################################################
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
-  S3_GHC_URL=$S3/heroku-ghc-$GHC_VER.tar.gz
+  S3_GHC_URL=$S3/xxx-heroku-ghc-$GHC_VER.tar.gz
   if curl --output /dev/null --silent --head --fail $S3_GHC_URL; then
     echo "-----> Installing prebuilt GHC $GHC_VER"
     curl -# -L $S3_GHC_URL | tar zxP -C $WORKING_HOME/vendor
@@ -51,7 +51,7 @@ export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-ins
 
 ########## cabal-install ###########################################
 if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
-  S3_CABAL_URL=$S3/heroku-cabal-install-$CABAL_VER.tar.gz
+  S3_CABAL_URL=$S3/xxx-heroku-cabal-install-$CABAL_VER.tar.gz
   if curl --output /dev/null --silent --head --fail $S3_CABAL_URL; then
     echo "-----> Installing prebuilt cabal-install $CABAL_VER"
     curl -# -L $S3_CABAL_URL | tar zxP -C $WORKING_HOME/vendor
