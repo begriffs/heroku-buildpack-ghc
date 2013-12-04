@@ -50,10 +50,11 @@ heroku run cabal repl   # Haskell repl with all app modules loaded
 
 ### Benefits of this buildpack
 
-* Latest binaries: GHC 7.6.3, Cabal 1.18.0.2
+* **Latest binaries: GHC 7.6.3, Cabal 1.18.0.2**
 * Uses cabal >=1.18 features to run the app and repl
 * Exposes Haskell platform binaries to your app and scripts
-* Bootstraps from the standard GHC distribution
+* Uses prebuilt binaries for speed but...
+* ...can fall back to building the standard GHC distribution
 
 ### Contributing
 
@@ -94,13 +95,13 @@ the shell so that everything can build.
 
 ### Building new binaries for Heroku
 
-As new versions of GHC and Cabal are released we can build them for
-Heroku so the buildpack won't have to. The buildpack can build from
-official sources but it takes longer.
+As new versions of GHC and Cabal are released we should build them for
+Heroku and put them on S3 to speed up future deploys for everyone. Luckily
+the buildpack can do the building too.
 
 Adjust the `GHC_VERSION` and `CABAL_VERSION` in `bin/compile` and
-`bin/release` then deploy an app. It will build the new binaries. You
-have to copy them to S3. Do it like this:
+`bin/release` then deploy. It will build the new binaries from the
+standard GHC distribution. Then copy the results to S3 like this:
 
 ```sh
 heroku run bash
@@ -123,7 +124,6 @@ s3cmd-1.5.0-alpha1/s3cmd put heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
 
 Thanks to Brian McKenna and others for their work on
 [heroku-buildpack-haskell](https://github.com/puffnfresh/heroku-buildpack-haskell)
-which inspired and informed this buildpack. Their project got too forked
-and fragmented over time, so I thought it best to start fresh with a new
-name and code. For a history of that project's contributions see [this article]
+which inspired and informed this buildpack. For a history of that project's
+contributions and ideas see [this article]
 (http://blog.begriffs.com/2013/08/haskell-on-heroku-omg-lets-get-this.html).
