@@ -84,7 +84,10 @@ rm -fr $CACHE_DIR/.cabal_sandbox
 cp -R $WORKING_HOME/.cabal_sandbox $CACHE_DIR
 
 echo "-----> Making GHC binaries available to Heroku command line"
-mv $WORKING_HOME/vendor $BUILD_DIR
+mkdir -p $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
+mv $WORKING_HOME/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
 echo "-----> Making cabal sandbox available to Heroku command line"
 mv $WORKING_HOME/.cabal_sandbox $BUILD_DIR
