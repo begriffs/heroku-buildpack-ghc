@@ -75,15 +75,15 @@ if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
   cp -R $WORKING_HOME/vendor/cabal-install-$CABAL_VER $CACHE_DIR
 else
   echo "-----> Restoring cached cabal $CABAL_VER binaries"
-  rm -fr $WORKING_HOME/vendor/cabal-install-$CABAL_VER
   cp -R $CACHE_DIR/cabal-install-$CABAL_VER $WORKING_HOME/vendor
 fi
 
 ########## project build ###########################################
 
+cabal sandbox init --sandbox $WORKING_HOME/.cabal_sandbox
 if [ -e $CACHE_DIR/.cabal_sandbox ]; then
   echo "-----> Restoring cached cabal packages"
-  rm -fr $BUILD_DIR/.cabal_sandbox
+  rm -fr $WORKING_HOME/.cabal_sandbox
   cp -R $CACHE_DIR/.cabal_sandbox $WORKING_HOME
 fi
 
@@ -93,7 +93,6 @@ cabal update
 
 echo "-----> Installing user application"
 cd $BUILD_DIR
-cabal sandbox init --sandbox $WORKING_HOME/.cabal_sandbox
 cabal install -j --disable-library-profiling --disable-executable-profiling --disable-shared
 
 echo "-----> Caching latest cabal packages"
