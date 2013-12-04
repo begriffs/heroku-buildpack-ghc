@@ -31,7 +31,7 @@ echo 'web: cabal run -- -p $PORT' > Procfile
 # Create a git repo and deploy!
 
 git init .
-git add .
+git add *
 git commit -m 'Initial commit'
 
 heroku create --stack=cedar --buildpack https://github.com/begriffs/heroku-buildpack-ghc.git
