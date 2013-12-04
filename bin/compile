@@ -9,20 +9,29 @@ WORKING_HOME=/app
 GHC_VER=7.6.3
 CABAL_VER=1.18.0.2
 
+S3=https://s3.amazonaws.com/heroku-ghc
+
 mkdir -p $CACHE_DIR/download
+mkdir -p $WORKING_HOME/vendor
 
 ########## GHC #####################################################
-if [ ! -e $CACHE_DIR/download/ghc-$GHC_VER ]; then
-  GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux.tar.bz2"
-  echo "-----> Downloading GHC $GHC_VER"
-  curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR/download
-fi
-
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
-  echo "-----> Installing GHC $GHC_VER"
-  cd $CACHE_DIR/download/ghc-$GHC_VER
-  ./configure --prefix $WORKING_HOME/vendor/ghc-$GHC_VER
-  make install
+  S3_GHC_URL=$S3/heroku-ghc-$GHC_VER.tar.gz
+  if curl --output /dev/null --silent --head --fail $S3_GHC_URL; then
+    echo "-----> Installing prebuilt GHC $GHC_VER"
+    curl -# -L $S3_GHC_URL | tar zxP -C $WORKING_HOME/vendor
+  else
+    echo "-----> Could not find prebuilt GHC $GHC_VER"
+    if [ ! -e $CACHE_DIR/download/ghc-$GHC_VER ]; then
+      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux.tar.bz2"
+      echo "-----> Downloading GHC $GHC_VER"
+      curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR/download
+    fi
+    echo "-----> Installing GHC $GHC_VER"
+    cd $CACHE_DIR/download/ghc-$GHC_VER
+    ./configure --prefix $WORKING_HOME/vendor/ghc-$GHC_VER
+    make install
+  fi
 
   echo "-----> Caching GHC $GHC_VER binaries"
   cp -R $WORKING_HOME/vendor/ghc-$GHC_VER $CACHE_DIR
@@ -41,17 +50,26 @@ export LD_LIBRARY_PATH=$LIBRARY_PATH
 export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal_sandbox/bin:$PATH
 
 ########## cabal-install ###########################################
-if [ ! -e $CACHE_DIR/download/cabal-install-$CABAL_VER ]; then
-  CABAL_URL="http://www.haskell.org/cabal/release/cabal-install-$CABAL_VER/cabal-install-$CABAL_VER.tar.gz"
-  echo "-----> Downloading cabal-install $CABAL_VER"
-  curl -# -L "$CABAL_URL" | gunzip | tar x -C $CACHE_DIR/download
+if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
+  S3_CABAL_URL=$S3/heroku-cabal-install-$CABAL_VER.tar.gz
+  if curl --output /dev/null --silent --head --fail $S3_CABAL_URL; then
+    echo "-----> Installing prebuilt cabal-install $CABAL_VER"
+    curl -# -L $S3_CABAL_URL | tar zxP -C $WORKING_HOME/vendor
+  else
+    echo "-----> Could not find prebuilt cabal-install $CABAL_VER"
+    if [ ! -e $CACHE_DIR/download/cabal-install-$CABAL_VER ]; then
+      CABAL_URL="http://www.haskell.org/cabal/release/cabal-install-$CABAL_VER/cabal-install-$CABAL_VER.tar.gz"
+      echo "-----> Downloading cabal-install $CABAL_VER"
+      curl -# -L "$CABAL_URL" | tar zx -C $CACHE_DIR/download
+    fi
 
-  echo "-----> Installing cabal-install $CABAL_VER"
+    echo "-----> Installing cabal-install $CABAL_VER"
 
-  cd $CACHE_DIR/download/cabal-install-$CABAL_VER
-  export PREFIX=$WORKING_HOME/vendor/cabal-install-$CABAL_VER
+    cd $CACHE_DIR/download/cabal-install-$CABAL_VER
+    export PREFIX=$WORKING_HOME/vendor/cabal-install-$CABAL_VER
 
-  ./bootstrap.sh
+    ./bootstrap.sh
+  fi
 
   echo "-----> Caching cabal $CABAL_VER binaries"
   cp -R $WORKING_HOME/vendor/cabal-install-$CABAL_VER $CACHE_DIR
