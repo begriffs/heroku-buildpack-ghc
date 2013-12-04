@@ -1,13 +1,13 @@
 <img src="img/haskell.png" alt="Styleguide Rails Logo" align="left" />
 <img src="img/heroku.png" alt="Styleguide Rails Logo" align="left" />
 
-## Deploy Haskell apps to Heroku
+<h2 align="right">Deploy Haskell apps to Heroku</h2>
 
 <br />
 
 This buildpack supports frameworks like Yesod, Snap, and Happstack with
-the latest stable GHC binaries and. Putting Haskell web applications
-online should be easy, and now it is. Try it for yourself.
+the latest stable GHC binaries. Putting Haskell web applications online
+should be easy, and now it is. Try it for yourself.
 
 ### Example: deploying a Snap app
 
