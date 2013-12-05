@@ -160,5 +160,8 @@ mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
+echo "-----> Making cabal config available to Heroku command line"
+mv $WORKING_HOME/.cabal $BUILD_DIR
+
 echo "-----> Making cabal sandbox available to Heroku command line"
 mv $WORKING_HOME/.cabal-sandbox $BUILD_DIR
