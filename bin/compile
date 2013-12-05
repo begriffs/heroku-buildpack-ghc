@@ -99,7 +99,7 @@ fi
 
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
-export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal_sandbox/bin:$PATH
+export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
 
 ########## cabal-install ###########################################
 if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
@@ -132,26 +132,27 @@ fi
 
 ########## project build ###########################################
 
-cd $BUILD_DIR
-cabal sandbox init --sandbox $WORKING_HOME/.cabal_sandbox
+cd $WORKING_HOME
+cabal sandbox init
 
-if [ -e $CACHE_DIR/.cabal_sandbox ]; then
-  echo "-----> Restoring cached cabal packages"
-  rm -fr $WORKING_HOME/.cabal_sandbox
-  cp -R $CACHE_DIR/.cabal_sandbox $WORKING_HOME
+cd $BUILD_DIR
+cabal sandbox init --sandbox $WORKING_HOME/.cabal-sandbox
+
+if [ -e $CACHE_DIR/.cabal-sandbox ]; then
+  echo "-----> Restoring cached cabal sandbox"
+  rm -fr $WORKING_HOME/.cabal-sandbox
+  cp -R $CACHE_DIR/.cabal-sandbox $WORKING_HOME
 fi
 
 echo "-----> Getting newest list of cabal packages"
-cd $WORKING_HOME
 cabal update
 
 echo "-----> Installing user application"
-cd $BUILD_DIR
 cabal install -j --disable-library-profiling --disable-executable-profiling --disable-shared
 
-echo "-----> Caching latest cabal packages"
-rm -fr $CACHE_DIR/.cabal_sandbox
-cp -R $WORKING_HOME/.cabal_sandbox $CACHE_DIR
+echo "-----> Caching latest cabal sandbox"
+rm -fr $CACHE_DIR/.cabal-sandbox
+cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
@@ -159,5 +160,8 @@ mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
+echo "-----> Making cabal config available to Heroku command line"
+mv $WORKING_HOME/.cabal $BUILD_DIR
+
 echo "-----> Making cabal sandbox available to Heroku command line"
-mv $WORKING_HOME/.cabal_sandbox $BUILD_DIR
+mv $WORKING_HOME/.cabal-sandbox $BUILD_DIR
