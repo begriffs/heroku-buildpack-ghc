@@ -14,6 +14,33 @@ S3=https://s3.amazonaws.com/heroku-ghc
 mkdir -p $CACHE_DIR/download
 mkdir -p $WORKING_HOME/vendor
 
+function install_prebuilt {
+  BINARY=$1
+  VER=$2
+
+  if [ ! -e $CACHE_DIR/$BINARY ]; then
+    BINARY_URL=$S3/heroku-$BINARY-$VER.gz
+    if curl --output /dev/null --silent --head --fail $BINARY_URL; then
+      echo "-----> Installing prebuilt $BINARY binary"
+      curl -# -L $BINARY_URL | gunzip -c > $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY
+      chmod a+x $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY
+
+      echo "-----> Installing prebuilt $BINARY shared scripts"
+      curl -# -L $S3/heroku-share-$BINARY-$VER.tar.gz | tar xz -C $WORKING_HOME/vendor/ghc-$GHC_VER/share
+
+      echo "-----> Caching $BINARY"
+      cp $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY $CACHE_DIR
+      cp -R $WORKING_HOME/vendor/ghc-$GHC_VER/share/$BINARY-$VER $CACHE_DIR
+    else
+      echo "-----> Could not find prebuilt $BINARY $VER (you may have problems later)"
+    fi
+  else
+    echo "-----> Restoring cached $BINARY"
+    cp $CACHE_DIR/$BINARY $WORKING_HOME/vendor/ghc-$GHC_VER/bin
+    cp -R $CACHE_DIR/$BINARY-$VER $WORKING_HOME/vendor/ghc-$GHC_VER/share
+  fi
+}
+
 ########## GHC #####################################################
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   S3_GHC_URL=$S3/heroku-ghc-$GHC_VER.tar.gz
@@ -75,27 +102,9 @@ echo "-----> Symlinking libffi"
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so.6
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so
 
-if [ ! -e $CACHE_DIR/happy ]; then
-  S3_HAPPY_URL=$S3/heroku-happy-1.19.2.gz
-  if curl --output /dev/null --silent --head --fail $S3_HAPPY_URL; then
-    echo "-----> Installing prebuilt happy binary"
-    curl -# -L $S3_HAPPY_URL | gunzip -c > $WORKING_HOME/vendor/ghc-$GHC_VER/bin/happy
-    chmod a+x $WORKING_HOME/vendor/ghc-$GHC_VER/bin/happy
 
-    echo "-----> Installing prebuilt happy shared scripts"
-    curl -# -L $S3/heroku-share-happy-1.19.2.tar.gz | tar xz -C $WORKING_HOME/vendor/ghc-$GHC_VER/share
-
-    echo "-----> Caching happy"
-    cp $WORKING_HOME/vendor/ghc-$GHC_VER/bin/happy $CACHE_DIR
-    cp -R $WORKING_HOME/vendor/ghc-$GHC_VER/share/happy-1.19.2 $CACHE_DIR
-  else
-    echo "-----> Could not find prebuilt happy 1.19.2 (you may have problems with Yesod)"
-  fi
-else
-  echo "-----> Restoring cached happy"
-  cp $CACHE_DIR/happy $WORKING_HOME/vendor/ghc-$GHC_VER/bin
-  cp -R $CACHE_DIR/happy-1.19.2 $WORKING_HOME/vendor/ghc-$GHC_VER/share
-fi
+install_prebuilt "happy" "1.19.2"
+install_prebuilt "alex" "3.1.3"
 
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
