@@ -57,6 +57,26 @@ After the first deploy using Anvil you can go back to the regular deploy
 process. This is because the cabal sandbox is cached between builds so
 future builds are incremental and fast.
 
+### Locking Package Versions
+
+Cabal sometimes gets confused on Heroku and tries installing outdated
+packages. If you have your app working locally you can constrain the
+remote package versions to match your local environment. Just do this:
+
+```sh
+cabal install cabal-constraints
+cabal-constraints dist/dist-sandbox-*/setup-config > cabal.config
+git add cabal.config
+
+# commit and push to fix remote build
+```
+
+Using cabal-constraints requires the Cabal version be exactly 1.18.1.2.
+This process will be improved in the Cabal 1.20 release, once
+cabal-constraints is deprecated in favor of the upcoming cabal-install
+freeze command. For more info, see the docs for
+[cabal-constraints](https://github.com/benarmston/cabal-constraints)
+
 ### Interacting with a running app
 
 ```sh
