@@ -173,4 +173,4 @@ echo "-----> Making cabal config available to Heroku command line"
 mv $WORKING_HOME/.cabal $BUILD_DIR
 
 echo "-----> Making cabal sandbox available to Heroku command line"
-mv $WORKING_HOME/.cabal-sandbox $BUILD_DIR
+cp -R $WORKING_HOME/.cabal-sandbox $BUILD_DIR
