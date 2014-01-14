@@ -109,16 +109,16 @@ if [ ! -e $CACHE_DIR/.libs/libpcre.so.1 ]; then
     curl -# -L $S3_LIBPCRE_URL > $WORKING_HOME/vendor/ghc-libs/.libs/libpcre.so.1
   else
     echo "-----> Could not find prebuilt libpcre"
-    if [ ! -e $CACHE_DIR/download/libpcre-8.34 ]; then
+    if [ ! -e $CACHE_DIR/download/pcre-8.34 ]; then
       PCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
       echo "-----> Downloading libpcre"
       curl -# -L "$PCRE_URL" | tar zx -C $CACHE_DIR/download
-      for dir in $CACHE_DIR/download/*/; do
-        echo "$dir"
-      done
+      # for dir in $CACHE_DIR/download/*/; do
+      #   echo "$dir"
+      # done
     fi
     echo "-----> Installing libpcre"
-    cd $CACHE_DIR/download/libpcre-8.34
+    cd $CACHE_DIR/download/pcre-8.34
     ./configure
     make
     #cp x86_64-unknown-linux-gnu/.libs/.libs/libpcre.so.1 $WORKING_HOME/vendor/ghc-libs
