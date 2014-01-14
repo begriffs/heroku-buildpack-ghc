@@ -113,6 +113,9 @@ if [ ! -e $CACHE_DIR/.libs/libpcre.so.1 ]; then
       PCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
       echo "-----> Downloading libpcre"
       curl -# -L "$PCRE_URL" | tar zx -C $CACHE_DIR/download
+      for dir in $CACHE_DIR/download/*/; do
+        echo "$dir"
+      done
     fi
     echo "-----> Installing libpcre"
     cd $CACHE_DIR/download/libpcre-8.34
