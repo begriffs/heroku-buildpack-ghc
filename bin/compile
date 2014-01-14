@@ -68,8 +68,9 @@ else
   cp -R $CACHE_DIR/ghc-$GHC_VER $WORKING_HOME/vendor
 fi
 
-echo "-----> Linking libgmp.so in an accessible place"
 mkdir -p $WORKING_HOME/vendor/ghc-libs
+mkdir -p $WORKING_HOME/vendor/ghc-includes
+echo "-----> Linking libgmp.so in an accessible place"
 ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
 
 if [ ! -e $CACHE_DIR/libffi.so.6.0.1 ]; then
@@ -102,43 +103,49 @@ echo "-----> Symlinking libffi"
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so.6
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so
 
-if [ ! -e $CACHE_DIR/.libs/libpcre.so.1 ]; then
-  S3_LIBPCRE_URL=$S3/.libs/libpcre.so.1
+if [ ! -e $CACHE_DIR/libpcre.so.1 ]; then
+  S3_LIBPCRE_URL=$S3/libpcre.so.1
   if curl --output /dev/null --silent --head --fail $S3_LIBPCRE_URL; then
     echo "-----> Installing prebuilt libpcre"
-    curl -# -L $S3_LIBPCRE_URL > $WORKING_HOME/vendor/ghc-libs/.libs/libpcre.so.1
+    curl -# -L $S3_LIBPCRE_URL > $WORKING_HOME/vendor/ghc-libs/libpcre.so.1
   else
     echo "-----> Could not find prebuilt libpcre"
     if [ ! -e $CACHE_DIR/download/pcre-8.34 ]; then
       PCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
       echo "-----> Downloading libpcre"
       curl -# -L "$PCRE_URL" | tar zx -C $CACHE_DIR/download
-      for f in $CACHE_DIR/download/pcre-8.34/*; do
-        echo "$f"
-      done
     fi
     echo "-----> Installing libpcre"
     cd $CACHE_DIR/download/pcre-8.34
     ./configure
     make
+    # for f in .libs/*; do
+    #   echo "$f"
+    # done
     #cp x86_64-unknown-linux-gnu/.libs/.libs/libpcre.so.1 $WORKING_HOME/vendor/ghc-libs
     cp .libs/libpcre.so $WORKING_HOME/vendor/ghc-libs
     cp .libs/libpcre.so.* $WORKING_HOME/vendor/ghc-libs
+    cp pcre.h $WORKING_HOME/vendor/ghc-includes
   fi
 
   echo "-----> Caching libpcre"
-  cp $WORKING_HOME/vendor/ghc-libs/.libs/libpcre.so.1 $CACHE_DIR
+  cp $WORKING_HOME/vendor/ghc-libs/libpcre.so $CACHE_DIR
+  cp $WORKING_HOME/vendor/ghc-libs/libpcre.so.* $CACHE_DIR
+  cp $WORKING_HOME/vendor/ghc-includes/pcre.h $CACHE_DIR
 else
   echo "-----> Restoring cached libpcre"
-  cp $CACHE_DIR/.libs/libpcre.so.1 $WORKING_HOME/vendor/ghc-libs
+  cp $CACHE_DIR/libpcre.so $WORKING_HOME/vendor/ghc-libs
+  cp $CACHE_DIR/libpcre.so.* $WORKING_HOME/vendor/ghc-libs
+  cp $CACHE_DIR/pcre.h $WORKING_HOME/vendor/ghc-includes
 fi
 
-echo "-----> Symlinking libpcre"
-ln -s $WORKING_HOME/vendor/ghc-libs/.libs/libpcre.so.1 $WORKING_HOME/vendor/ghc-libs/libpcre.so
+# echo "-----> Symlinking libpcre"
+# ln -s $WORKING_HOME/vendor/ghc-libs/libpcre.so.1 $WORKING_HOME/vendor/ghc-libs/libpcre.so
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
 
+export C_INCLUDE_PATH=$WORKING_HOME/vendor/ghc-includes:/usr/include:$
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
 export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
@@ -199,6 +206,7 @@ cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-includes $BUILD_DIR/vendor # needed?
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
