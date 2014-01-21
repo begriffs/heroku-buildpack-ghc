@@ -8,8 +8,12 @@ WORKING_HOME=/app
 
 GHC_VER=7.6.3
 CABAL_VER=1.18.0.2
-
+CLEAR_CACHE=true
 S3=https://s3.amazonaws.com/heroku-ghc
+
+if $CLEAR_CACHE ; then
+  rm -fr $CACHE_DIR/
+fi
 
 mkdir -p $CACHE_DIR/download
 mkdir -p $WORKING_HOME/vendor
