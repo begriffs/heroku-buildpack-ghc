@@ -157,7 +157,8 @@ echo "-----> Getting newest list of cabal packages"
 cabal update
 
 echo "-----> Installing user application"
-cabal install -j --disable-library-profiling --disable-executable-profiling --disable-shared
+cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared
+cabal build -j
 
 echo "-----> Caching latest cabal sandbox"
 rm -fr $CACHE_DIR/.cabal-sandbox
