@@ -158,6 +158,7 @@ cabal update
 
 echo "-----> Installing user application"
 cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared
+cabal install --only-dependencies
 cabal build -j
 
 echo "-----> Caching latest cabal sandbox"
