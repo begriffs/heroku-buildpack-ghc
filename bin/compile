@@ -41,6 +41,38 @@ function install_prebuilt {
   fi
 }
 
+function install_prebuilt_library {
+  NAME=$1
+  VER=$2
+  SHAREDLIB=$3
+  SOURCE_URL=$4
+
+  if [ ! -e $CACHE_DIR/$SHAREDLIB ]; then
+    SHAREDLIB_URL=$S3/$SHAREDLIB
+    if curl --output /dev/null --silent --head --fail $SHAREDLIB_URL; then
+      echo "-----> Installing prebuilt $NAME"
+      curl -# -L $SHAREDLIB_URL > $WORKING_HOME/vendor/ghc-libs/$SHAREDLIB
+    else
+      echo "-----> Could not find prebuilt $NAME"
+      if [ ! -e $CACHE_DIR/download/$NAME-$VER ]; then
+        echo "-----> Downloading $NAME"
+        curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
+      fi
+      echo "-----> Installing $NAME"
+      cd $CACHE_DIR/download/$NAME-$VER
+      ./configure
+      make
+      cp x86_64-unknown-linux-gnu/.libs/$SHAREDLIB $WORKING_HOME/vendor/ghc-libs
+    fi
+
+    echo "-----> Caching $NAME"
+    cp $WORKING_HOME/vendor/ghc-libs/$SHAREDLIB $CACHE_DIR
+  else
+    echo "-----> Restoring cached $NAME"
+    cp $CACHE_DIR/$SHAREDLIB $WORKING_HOME/vendor/ghc-libs
+  fi
+}
+
 ########## GHC #####################################################
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   S3_GHC_URL=$S3/heroku-ghc-$GHC_VER.tar.gz
@@ -68,40 +100,15 @@ else
   cp -R $CACHE_DIR/ghc-$GHC_VER $WORKING_HOME/vendor
 fi
 
-echo "-----> Linking libgmp.so in an accessible place"
+mkdir -p $WORKING_HOME/vendor/ghc-includes
 mkdir -p $WORKING_HOME/vendor/ghc-libs
+echo "-----> Linking libgmp.so in an accessible place"
 ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
 
-if [ ! -e $CACHE_DIR/libffi.so.6.0.1 ]; then
-  S3_LIBFFI_URL=$S3/libffi.so.6.0.1
-  if curl --output /dev/null --silent --head --fail $S3_LIBFFI_URL; then
-    echo "-----> Installing prebuilt libffi"
-    curl -# -L $S3_LIBFFI_URL > $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1
-  else
-    echo "-----> Could not find prebuilt libffi"
-    if [ ! -e $CACHE_DIR/download/libffi-3.0.13 ]; then
-      FFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
-      echo "-----> Downloading libffi"
-      curl -# -L "$FFI_URL" | tar zx -C $CACHE_DIR/download
-    fi
-    echo "-----> Installing libffi"
-    cd $CACHE_DIR/download/libffi-3.0.13
-    ./configure
-    make
-    cp x86_64-unknown-linux-gnu/.libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs
-  fi
-
-  echo "-----> Caching libffi"
-  cp $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $CACHE_DIR
-else
-  echo "-----> Restoring cached libffi"
-  cp $CACHE_DIR/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs
-fi
-
+install_prebuilt_library "libffi" "3.0.13" "libffi.so.6.0.1" "ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
 echo "-----> Symlinking libffi"
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so.6
 ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so
-
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
