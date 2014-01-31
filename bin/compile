@@ -44,33 +44,33 @@ function install_prebuilt {
 function install_prebuilt_library {
   NAME=$1
   VER=$2
-  SHAREDLIB=$3
-  SOURCE_URL=$4
-
-  if [ ! -e $CACHE_DIR/$SHAREDLIB ]; then
-    SHAREDLIB_URL=$S3/$SHAREDLIB
-    if curl --output /dev/null --silent --head --fail $SHAREDLIB_URL; then
-      echo "-----> Installing prebuilt $NAME"
-      curl -# -L $SHAREDLIB_URL > $WORKING_HOME/vendor/ghc-libs/$SHAREDLIB
+  SOURCE_URL=$3
+  SOURCE_DIR=$4
+  
+  if [ ! -e $CACHE_DIR/$NAME-$VER ]; then
+    LIBFILES_URL=$S3/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
+    if curl --output /dev/null --silent --head --fail $LIBFILES_URL; then
+      echo "-----> Installing prebuilt $NAME-$VER"
+      curl -# -L "$LIBFILES_URL" | tar xz -C $WORKING_HOME/vendor
     else
-      echo "-----> Could not find prebuilt $NAME"
-      if [ ! -e $CACHE_DIR/download/$NAME-$VER ]; then
+      echo "-----> Could not find prebuilt $NAME-$VER"
+      if [ ! -e $CACHE_DIR/download/$SOURCE_DIR ]; then
         echo "-----> Downloading $NAME"
         curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
       fi
-      echo "-----> Installing $NAME"
-      cd $CACHE_DIR/download/$NAME-$VER
-      ./configure
-      make
-      cp x86_64-unknown-linux-gnu/.libs/$SHAREDLIB $WORKING_HOME/vendor/ghc-libs
+      echo "-----> Installing $NAME into cache"
+      mkdir -p $CACHE_DIR/$NAME-$VER/ghc-libs
+      mkdir -p $CACHE_DIR/$NAME-$VER/ghc-includes
+      mkdir -p $CACHE_DIR/$NAME-$VER/build
+      cd $CACHE_DIR/download/$SOURCE_DIR
+      ./configure --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes
+      make install
+      rm -rf $CACHE_DIR/$NAME-$VER/build
     fi
-
-    echo "-----> Caching $NAME"
-    cp $WORKING_HOME/vendor/ghc-libs/$SHAREDLIB $CACHE_DIR
-  else
-    echo "-----> Restoring cached $NAME"
-    cp $CACHE_DIR/$SHAREDLIB $WORKING_HOME/vendor/ghc-libs
   fi
+  echo "-----> Restoring $NAME files from cache"
+  cp $CACHE_DIR/$NAME-$VER/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
+  cp $CACHE_DIR/$NAME-$VER/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
 }
 
 ########## GHC #####################################################
@@ -100,19 +100,21 @@ else
   cp -R $CACHE_DIR/ghc-$GHC_VER $WORKING_HOME/vendor
 fi
 
-mkdir -p $WORKING_HOME/vendor/ghc-includes
 mkdir -p $WORKING_HOME/vendor/ghc-libs
+mkdir -p $WORKING_HOME/vendor/ghc-includes
 echo "-----> Linking libgmp.so in an accessible place"
 ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
 
-install_prebuilt_library "libffi" "3.0.13" "libffi.so.6.0.1" "ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
-echo "-----> Symlinking libffi"
-ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so.6
-ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-libs/libffi.so
+LIBFFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
+install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13"
+
+LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
+install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34"
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
 
+export C_INCLUDE_PATH=$WORKING_HOME/vendor/ghc-includes:/usr/include:$C_INCLUDE_PATH
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
 export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
