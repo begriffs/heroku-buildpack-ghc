@@ -77,6 +77,18 @@ cabal-constraints is deprecated in favor of the upcoming cabal-install
 freeze command. For more info, see the docs for
 [cabal-constraints](https://github.com/benarmston/cabal-constraints)
 
+### Clearing the build cache
+
+If you want to force everything to reinstall from scratch, set a Heroku
+environment variable prior to pushing the deploy.
+
+```sh
+heroku config:set CLEAR_BUILDPACK_CACHE=1
+
+# allow the buildpack to see environment vars
+heroku labs:enable user-env-compile
+```
+
 ### Interacting with a running app
 
 ```sh
