@@ -156,6 +156,37 @@ s3cmd-1.5.0-alpha1/s3cmd put heroku-ghc-[VERSION].tar.gz s3://[BUCKET]
 s3cmd-1.5.0-alpha1/s3cmd put heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
 ```
 
+### Yesod-specific instructions
+
+#### General
+
+1. Modify your Procfile to look like
+
+```procfile
+    web: cabal run -- Staging -p $PORT
+```
+
+...for a staging environment, or like
+
+```procfile
+    web: cabal run -- Production -p $PORT
+```
+
+...for a production environment.
+
+
+#### Yesod + MySQL/Postgres
+
+1.  When deploying Yesod backed by a database like MySQL or Postgres you'll want to include the [heroku package](http://hackage.haskell.org/package/heroku) in order to load environment variables directly from heroku, using these instructions:
+  * http://pbrisbin.com/posts/parsing_database_url/
+  * http://blog.begriffs.com/2013/08/deploying-yesod-to-heroku-with-postgres.html
+
+2. Setup your database url in the heroku environment. E.g.
+
+```sh
+    heroku config:set DATABASE_URL=*****.************.*********.rds.amazonaws.com
+```
+
 ### Thanks
 
 Thanks to Brian McKenna and others for their work on
