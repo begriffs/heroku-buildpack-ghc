@@ -7,7 +7,7 @@ CACHE_DIR=$2
 WORKING_HOME=/app
 
 GHC_VER=7.6.3
-CABAL_VER=1.18.0.2
+CABAL_VER=1.18.1.2
 S3=https://s3.amazonaws.com/heroku-ghc
 
 if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then

@@ -1,7 +1,7 @@
 #!/bin/bash
 
 GHC_VER=7.6.3
-CABAL_VER=1.18.0.2
+CABAL_VER=1.18.1.2
 
 cat <<EOF
 ---
