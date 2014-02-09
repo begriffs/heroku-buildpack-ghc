@@ -168,6 +168,14 @@ s3cmd-1.5.0-alpha1/s3cmd put heroku-ghc-[VERSION].tar.gz s3://[BUCKET]
 s3cmd-1.5.0-alpha1/s3cmd put heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
 ```
 
+### Addendum: Character encoding on Heroku
+
+Haskell uses the default system character encoding unless you specify otherwise.
+You probably want this to be UTF-8, so to avoid problems set the following
+option:
+
+    heroku config:add LANG=en_US.UTF-8
+
 ### Thanks
 
 Thanks to Brian McKenna and others for their work on
