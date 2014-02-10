@@ -10,6 +10,8 @@ GHC_VER=7.6.3
 CABAL_VER=1.18.0.2
 S3=https://s3.amazonaws.com/heroku-ghc
 
+PROFILE_PATH="$BUILD_DIR/.profile.d/haskell.sh"
+
 if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
   echo "-----> Clearing the buildpack cache"
   rm -fr $CACHE_DIR/
@@ -17,6 +19,7 @@ fi
 
 mkdir -p $CACHE_DIR/download
 mkdir -p $WORKING_HOME/vendor
+mkdir -p $(dirname $PROFILE_PATH)
 
 function install_prebuilt {
   BINARY=$1
@@ -43,6 +46,16 @@ function install_prebuilt {
     cp $CACHE_DIR/$BINARY $WORKING_HOME/vendor/ghc-$GHC_VER/bin
     cp -R $CACHE_DIR/$BINARY-$VER $WORKING_HOME/vendor/ghc-$GHC_VER/share
   fi
+}
+
+# Usage: $ set-env key value
+function set-env (){
+  echo "export $1=$2" >> $PROFILE_PATH
+}
+
+# Usage: $ set-default-env key value
+function set-default-env (){
+  echo "export $1=\${$1:-$2}" >> $PROFILE_PATH
 }
 
 ########## GHC #####################################################
@@ -110,9 +123,11 @@ ln -s $WORKING_HOME/vendor/ghc-libs/libffi.so.6.0.1 $WORKING_HOME/vendor/ghc-lib
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
 
+export LANG=en_US.UTF-8
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
 export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
+
 
 ########## cabal-install ###########################################
 if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
@@ -164,6 +179,14 @@ echo "-----> Installing user application"
 cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared
 cabal install --only-dependencies
 cabal build -j
+
+# Set context environment variables.
+set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/cabal-install-$CABAL_VER/bin:$PATH"
+
+set-default-env LANG en_US.UTF-8
+set-default-env LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
+set-default-env LD_LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
+
 
 echo "-----> Caching latest cabal sandbox"
 rm -fr $CACHE_DIR/.cabal-sandbox
