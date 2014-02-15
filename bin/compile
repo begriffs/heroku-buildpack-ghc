@@ -70,7 +70,7 @@ function install_prebuilt_library {
       mkdir -p $CACHE_DIR/$NAME-$VER/ghc-includes
       mkdir -p $CACHE_DIR/$NAME-$VER/build
       cd $CACHE_DIR/download/$SOURCE_DIR
-      ./configure --exec-prefix=$CACHE_DIR/$NAME-$VER/build --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes
+      ./configure --exec-prefix=$CACHE_DIR/$NAME-$VER/build --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes --enable-static=no
       make install
       rm -rf $CACHE_DIR/$NAME-$VER/build
     fi
