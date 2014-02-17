@@ -12,10 +12,10 @@ S3=https://s3.amazonaws.com/heroku-ghc
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/haskell.sh"
 
-if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
-  echo "-----> Clearing the buildpack cache"
-  rm -fr $CACHE_DIR/
-fi
+#if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
+echo "-----> Clearing the buildpack cache"
+rm -fr $CACHE_DIR/
+#fi
 
 mkdir -p $CACHE_DIR/download
 mkdir -p $WORKING_HOME/vendor
@@ -53,7 +53,8 @@ function install_prebuilt_library {
   VER=$2
   SOURCE_URL=$3
   SOURCE_DIR=$4
-  
+  FLAGS=$5
+
   if [ ! -e $CACHE_DIR/$NAME-$VER ]; then
     LIBFILES_URL=$S3/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
     if curl --output /dev/null --silent --head --fail $LIBFILES_URL; then
@@ -70,14 +71,14 @@ function install_prebuilt_library {
       mkdir -p $CACHE_DIR/$NAME-$VER/ghc-includes
       mkdir -p $CACHE_DIR/$NAME-$VER/build
       cd $CACHE_DIR/download/$SOURCE_DIR
-      ./configure --exec-prefix=$CACHE_DIR/$NAME-$VER/build --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes --enable-static=no
+      ./configure $FLAGS --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes
       make install
       rm -rf $CACHE_DIR/$NAME-$VER/build
     fi
   fi
   echo "-----> Restoring $NAME files from cache"
-  cp $CACHE_DIR/$NAME-$VER/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
-  cp $CACHE_DIR/$NAME-$VER/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
+  find $CACHE_DIR/$NAME-$VER/ghc-libs/ -type f -exec cp '{}' $WORKING_HOME/vendor/ghc-libs/ \;         # alternate/quiet form of: cp $CACHE_DIR/$NAME-$VER/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
+  find $CACHE_DIR/$NAME-$VER/ghc-includes/ -type f -exec cp '{}' $WORKING_HOME/vendor/ghc-includes/ \; # alternate/quiet form of: cp $CACHE_DIR/$NAME-$VER/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
 }
 
 # Usage: $ set-env key value
@@ -108,7 +109,6 @@ if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
     ./configure --prefix $WORKING_HOME/vendor/ghc-$GHC_VER
     make install
   fi
-
   echo "-----> Caching GHC $GHC_VER binaries"
   cp -R $WORKING_HOME/vendor/ghc-$GHC_VER $CACHE_DIR
 else
@@ -123,10 +123,19 @@ echo "-----> Linking libgmp.so in an accessible place"
 ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
 
 LIBFFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
-install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13"
+install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13" "--enable-static=no"
+if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
+  echo "-----> Move libffi files into the correct locations" # See https://github.com/atgreen/libffi/issues/55 & https://github.com/atgreen/libffi/issues/24
+  rm -rf $CACHE_DIR/libffi-3.0.13/ghc-libs/*
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.h $CACHE_DIR/libffi-3.0.13/ghc-libs/
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.so* $CACHE_DIR/libffi-3.0.13/ghc-includes/
+  cp $CACHE_DIR/libffi-3.0.13/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
+  cp $CACHE_DIR/libffi-3.0.13/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
+  rm -rf $CACHE_DIR/libffi-3.0.13/libs
+fi
 
 LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
-install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34"
+install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34" "--enable-silent-rules --enable-static=no"
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
@@ -192,6 +201,7 @@ cabal build -j
 set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/cabal-install-$CABAL_VER/bin:$PATH"
 
 set-default-env LANG en_US.UTF-8
+set-default-env C_INCLUDE_PATH /app/vendor/ghc-includes:/usr/include
 set-default-env LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
 set-default-env LD_LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
 
