@@ -77,17 +77,47 @@ cabal-constraints is deprecated in favor of the upcoming cabal-install
 freeze command. For more info, see the docs for
 [cabal-constraints](https://github.com/benarmston/cabal-constraints)
 
-### Clearing the build cache
+### Configuring the Build
 
-If you want to force everything to reinstall from scratch, set a Heroku
-environment variable prior to pushing the deploy.
+You can change build settings through Heroku environment variables.
 
 ```sh
-heroku config:set CLEAR_BUILDPACK_CACHE=1
-
 # allow the buildpack to see environment vars
-heroku labs:enable user-env-compile
+heroku labs:enable buildpack-env-arg
+
+# then set the variable of your choice
+heroku config:set VARIABLE=value
 ```
+
+Here are the options
+<table>
+<thead>
+<tr><th>name</th><th>description</th><th>default</th></tr>
+</thead>
+<tbody>
+<tr>
+  <td>CLEAR_BUILDPACK_CACHE</td>
+  <td>Force everything to reinstall from scratch by setting to 1.</td>
+  <td>0</td>
+</tr>
+<tr>
+  <td>GHC_VER</td>
+  <td>GHC version to download or build</td>
+  <td>7.6.3</td>
+</tr>
+<tr>
+  <td>CABAL_VER</td>
+  <td>Version of Cabal (not cabal-install)</td>
+  <td>1.18.0.2</td>
+</tr>
+<tr>
+  <td>PREBUILT</td>
+  <td>Base url for the prebuilt binary cache</td>
+  <td>https://s3.amazonaws.com/heroku-ghc</td>
+</tr>
+</tbody>
+</table>
+
 
 ### Interacting with a running app
 
