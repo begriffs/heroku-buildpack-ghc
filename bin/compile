@@ -36,10 +36,10 @@ WORKING_HOME=/app
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/haskell.sh"
 
-#if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
-echo "-----> Clearing the buildpack cache"
-rm -fr $CACHE_DIR/
-#fi
+if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
+  echo "-----> Clearing the buildpack cache"
+  rm -fr $CACHE_DIR/
+fi
 
 mkdir -p $CACHE_DIR/download
 mkdir -p $WORKING_HOME/vendor
@@ -100,13 +100,13 @@ function install_prebuilt_library {
       rm -rf $CACHE_DIR/$NAME-$VER/build
       for dir in $CACHE_DIR/$NAME-$VER/ghc-libs/*/ ; do rm -rf $dir ; done
       for dir in $CACHE_DIR/$NAME-$VER/ghc-includes/*/ ; do rm -rf $dir ; done
-      find $CACHE_DIR/$NAME-$VER/ghc-libs -type f -not -name '*.so*' -print0| xargs -0 -r rm
-      find $CACHE_DIR/$NAME-$VER/ghc-includes -type f -not -name '*.h*' -print0| xargs -0 -r rm
+      find $CACHE_DIR/$NAME-$VER/ghc-libs -xtype f -not -name '*.so*' -print0| xargs -0 -r rm
+      find $CACHE_DIR/$NAME-$VER/ghc-includes -xtype f -not -name '*.h*' -print0| xargs -0 -r rm
     fi
   fi
   echo "-----> Restoring $NAME files from cache"
-  find $CACHE_DIR/$NAME-$VER/ghc-libs/ -type f -exec cp '{}' $WORKING_HOME/vendor/ghc-libs/ \;         # alternate/quiet form of: cp $CACHE_DIR/$NAME-$VER/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
-  find $CACHE_DIR/$NAME-$VER/ghc-includes/ -type f -exec cp '{}' $WORKING_HOME/vendor/ghc-includes/ \; # alternate/quiet form of: cp $CACHE_DIR/$NAME-$VER/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
+  find $CACHE_DIR/$NAME-$VER/ghc-libs/ -xtype f -exec cp -P '{}' $WORKING_HOME/vendor/ghc-libs/ \;         # alternate/quiet form of: cp -P $CACHE_DIR/$NAME-$VER/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
+  find $CACHE_DIR/$NAME-$VER/ghc-includes/ -xtype f -exec cp -P '{}' $WORKING_HOME/vendor/ghc-includes/ \; # alternate/quiet form of: cp -P $CACHE_DIR/$NAME-$VER/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
 }
 
 # Usage: $ set-env key value
@@ -241,7 +241,6 @@ cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
-mv $WORKING_HOME/vendor/ghc-includes $BUILD_DIR/vendor/ghc-includes
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
