@@ -78,7 +78,6 @@ function install_prebuilt_library {
   SOURCE_URL=$3
   SOURCE_DIR=$4
   FLAGS=$5
-
   if [ ! -e $CACHE_DIR/$NAME-$VER ]; then
     PREBUILT_LIB_URL=$S3/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
     if curl --output /dev/null --silent --head --fail $PREBUILT_LIB_URL; then
@@ -97,7 +96,12 @@ function install_prebuilt_library {
       cd $CACHE_DIR/download/$SOURCE_DIR
       ./configure $FLAGS --prefix=$CACHE_DIR/$NAME-$VER/build --libdir=$CACHE_DIR/$NAME-$VER/ghc-libs --includedir=$CACHE_DIR/$NAME-$VER/ghc-includes
       make install
+      # Remove unnecessary files
       rm -rf $CACHE_DIR/$NAME-$VER/build
+      for dir in $CACHE_DIR/$NAME-$VER/ghc-libs/*/ ; do rm -rf $dir ; done
+      for dir in $CACHE_DIR/$NAME-$VER/ghc-includes/*/ ; do rm -rf $dir ; done
+      find $CACHE_DIR/$NAME-$VER/ghc-libs -type f -not -name '*.so*' -print0| xargs -0 -r rm
+      find $CACHE_DIR/$NAME-$VER/ghc-includes -type f -not -name '*.h*' -print0| xargs -0 -r rm
     fi
   fi
   echo "-----> Restoring $NAME files from cache"
@@ -186,7 +190,6 @@ if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
     fi
 
     echo "-----> Installing cabal-install $CABAL_VER"
-
     cd $CACHE_DIR/download/cabal-install-$CABAL_VER
     export PREFIX=$WORKING_HOME/vendor/cabal-install-$CABAL_VER
 
@@ -238,6 +241,7 @@ cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-includes $BUILD_DIR/vendor/ghc-includes
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
