@@ -164,7 +164,7 @@ if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
 fi
 
 LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
-install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34" "--enable-silent-rules --enable-static=no"
+install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34" "--enable-silent-rules --enable-static=no --disable-cpp"
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
