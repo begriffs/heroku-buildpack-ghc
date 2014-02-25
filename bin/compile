@@ -79,7 +79,7 @@ function install_prebuilt_library {
   SOURCE_DIR=$4
   FLAGS=$5
   if [ ! -e $CACHE_DIR/$NAME-$VER ]; then
-    PREBUILT_LIB_URL=$S3/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
+    PREBUILT_LIB_URL=$PREBUILT/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
     if curl --output /dev/null --silent --head --fail $PREBUILT_LIB_URL; then
       echo "-----> Installing prebuilt $NAME-$VER"
       curl -# -L "$PREBUILT_LIB_URL" | tar xz -C $WORKING_HOME/vendor
