@@ -1,7 +1,7 @@
 <img src="img/haskell.png" alt="Styleguide Rails Logo" align="left" />
 <img src="img/heroku.png" alt="Styleguide Rails Logo" align="left" />
-
-<h2 align="right">Deploy Haskell apps to Heroku</h2>
+<br />
+<h2 align="center">Deploy Haskell apps to Heroku</h2>
 
 <br />
 
