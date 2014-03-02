@@ -163,6 +163,8 @@ fi
 
 LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
 install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34" "--enable-silent-rules --enable-static=no --disable-cpp"
+LIBICU_URL="http://download.icu-project.org/files/icu4c/52.1/icu4c-52_1-src.tgz"
+install_prebuilt_library "libicu" "52.1" $LIBICU_URL "icu/source"
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
