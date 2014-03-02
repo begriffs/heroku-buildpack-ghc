@@ -177,9 +177,9 @@ As new versions of GHC and Cabal are released we should build them for
 Heroku and put them on S3 to speed up future deploys for everyone. Luckily
 the buildpack can do the building too.
 
-Adjust the `GHC_VERSION` and `CABAL_VERSION` in `bin/compile` and
-`bin/release` then deploy. It will build the new binaries from the
-standard GHC distribution. Then copy the results to S3 like this:
+Adjust the `GHC_VER` and `CABAL_VER` environment vars and then
+deploy. It will build the new binaries from the standard GHC
+distribution. Then copy the results to S3 like this:
 
 ```sh
 heroku run bash
