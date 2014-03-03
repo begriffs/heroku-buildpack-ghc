@@ -1,3 +1,7 @@
 #!/bin/bash
 
-echo Haskell; exit 0
+if [ -n "$(find "$1" -maxdepth 1 -name '*.cabal' -print -quit)" ]; then
+  echo "Haskell" && exit 0
+else
+  exit 1
+fi
