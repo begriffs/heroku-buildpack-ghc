@@ -171,6 +171,14 @@ have privileges to adjust `/usr/lib` in the deployed app so we create a
 symbolic link in a place we are permitted and set linker variables in
 the shell so that everything can build.
 
+### External dependencies
+
+Some packages have external dependencies (i.e. non-Haskell dependencies which cannot be satisfied by `cabal`). If you come across such a package, check in `contribs` to see if someone has already created patches for the dependencies. If they have, you should be able to
+```sh
+patch -p0 < contribs/DEP.patch
+```
+to patch the buildpack and proceed. If not, you'll need to modify `bin/compile` yourself. Contributing these changes back as patches is appreciated.
+
 ### Building new binaries for Heroku
 
 As new versions of GHC and Cabal are released we should build them for
