@@ -154,8 +154,8 @@ install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13" "--enable
 if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
   echo "-----> Move libffi files into the correct locations" # See https://github.com/atgreen/libffi/issues/55 & https://github.com/atgreen/libffi/issues/24
   rm -rf $CACHE_DIR/libffi-3.0.13/ghc-libs/*
-  mv $CACHE_DIR/libffi-3.0.13/libs/*.h $CACHE_DIR/libffi-3.0.13/ghc-libs/
-  mv $CACHE_DIR/libffi-3.0.13/libs/*.so* $CACHE_DIR/libffi-3.0.13/ghc-includes/
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.so* $CACHE_DIR/libffi-3.0.13/ghc-libs/
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.h $CACHE_DIR/libffi-3.0.13/ghc-includes/
   cp $CACHE_DIR/libffi-3.0.13/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
   cp $CACHE_DIR/libffi-3.0.13/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
   rm -rf $CACHE_DIR/libffi-3.0.13/libs
