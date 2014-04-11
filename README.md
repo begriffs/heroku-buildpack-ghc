@@ -107,7 +107,7 @@ Here are the options
 </tr>
 <tr>
   <td>CABAL_VER</td>
-  <td>Version of Cabal (not cabal-install)</td>
+  <td>Version of cabal-install</td>
   <td>1.18.0.2</td>
 </tr>
 <tr>
@@ -128,7 +128,7 @@ heroku run cabal repl   # Haskell repl with all app modules loaded
 
 ### Benefits of this buildpack
 
-* **Latest binaries: GHC 7.6.3, Cabal 1.18.0.2**
+* **Latest binaries: GHC 7.6.3, cabal-install 1.18.0.2**
 * Uses cabal >=1.18 features to run the app and repl
 * Exposes Haskell platform binaries to your app and scripts
 * Uses prebuilt binaries for speed but...
