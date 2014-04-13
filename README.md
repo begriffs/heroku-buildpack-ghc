@@ -53,9 +53,8 @@ heroku plugins:install https://github.com/ddollar/heroku-anvil
 heroku build -r -b https://github.com/begriffs/heroku-buildpack-ghc.git
 ```
 
-After the first deploy using Anvil you can go back to the regular deploy
-process. This is because the cabal sandbox is cached between builds so
-future builds are incremental and fast.
+The Anvil cabal sandbox is cached between builds so future builds
+are incremental and faster.
 
 ### Locking Package Versions
 
