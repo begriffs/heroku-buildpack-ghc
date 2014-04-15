@@ -49,13 +49,30 @@ compilation can take so long that Heroku cuts it off. If this happens
 fear not, you can build your app with an Anvil server.
 
 ```sh
+# Enable Anvil builds
 heroku plugins:install https://github.com/ddollar/heroku-anvil
+
+# Move big build artifacts out of the way or else the upload
+# to Anvil will be very slow
+mkdir -p /tmp/deploy-stash ; mv .cabal-sandbox /tmp/deploy-stash  ; mv dist /tmp/deploy-stash
+
+# Build your slug and cache without any time limits
 heroku build -r -b https://github.com/begriffs/heroku-buildpack-ghc.git
+
+# Use Anvil-generated cache next time we do a regular git push to Heroku
+heroku config:set EXTERNAL_CACHE=$(cat .anvil/cache)
+
+# Bring your sandbox etc back
+mv /tmp/deploy-stash/.cabal-sandbox . ; mv /tmp/deploy-stash/dist .
 ```
 
-After the first deploy using Anvil you can go back to the regular deploy
-process. This is because the cabal sandbox is cached between builds so
-future builds are incremental and fast.
+After the first deploy using Anvil you can go back to the regular
+deploy process. This is because the cabal sandbox etc are cached
+by Anvil and will be retrieved, making future builds incremental
+and fast.
+
+Remember to `heroku config:unset EXTERNAL_CACHE` after your first
+successful regular (post-Anvil) git push.
 
 ### Locking Package Versions
 
