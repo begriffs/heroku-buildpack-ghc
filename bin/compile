@@ -231,6 +231,8 @@ set-default-env C_INCLUDE_PATH /app/vendor/ghc-includes:/usr/include
 set-default-env LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
 set-default-env LD_LIBRARY_PATH /app/vendor/ghc-libs:/usr/lib
 
+echo "-----> Cleaning any source downloads from the build cache"
+rm -fr $CACHE_DIR/download
 
 echo "-----> Caching latest cabal sandbox"
 rm -fr $CACHE_DIR/.cabal-sandbox
