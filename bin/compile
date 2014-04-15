@@ -7,11 +7,11 @@ CACHE_DIR="$2"
 ENV_DIR="$3"
 
 # Default configuration which you can change by setting environment variables
-# e.g. heroku config:set CLEAR_BUILDPACK_CACHE=1
+# e.g. heroku config:set CLEAR_CACHE=1
 GHC_VER=7.6.3
 CABAL_VER=1.18.0.2
 PREBUILT=https://s3.amazonaws.com/heroku-ghc
-CLEAR_BUILDPACK_CACHE=0
+CLEAR_CACHE=0
 #############################################################################
 
 export_env_dir() {
@@ -36,9 +36,18 @@ WORKING_HOME=/app
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/haskell.sh"
 
-if [[ $CLEAR_BUILDPACK_CACHE -eq 1 ]] ; then
+if [[ $CLEAR_CACHE -eq 1 ]] ; then
   echo "-----> Clearing the buildpack cache"
   rm -fr $CACHE_DIR/
+fi
+
+if [[ -n $EXTERNAL_CACHE ]] ; then
+  echo "-----> Clearing the buildpack cache"
+  rm -fr $CACHE_DIR/
+  mkdir $CACHE_DIR
+
+  echo "-----> Retrieving external cache: $EXTERNAL_CACHE"
+  curl $EXTERNAL_CACHE | tar zxf - -C $CACHE_DIR
 fi
 
 mkdir -p $CACHE_DIR/download

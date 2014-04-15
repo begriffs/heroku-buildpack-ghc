@@ -96,9 +96,14 @@ Here are the options
 </thead>
 <tbody>
 <tr>
-  <td>CLEAR_BUILDPACK_CACHE</td>
+  <td>CLEAR_CACHE</td>
   <td>Force everything to reinstall from scratch by setting to 1.</td>
   <td>0</td>
+</tr>
+<tr>
+  <td>EXTERNAL_CACHE</td>
+  <td>Url of replacement buildpack cache tarball. Useful for Anvil.</td>
+  <td></td>
 </tr>
 <tr>
   <td>GHC_VER</td>
