@@ -1,6 +1,9 @@
 #!/bin/bash
 # bin/compile <build-dir> <cache-dir> <env-dir>
 
+set -e            # fail fast
+set -o pipefail   # do not ignore exit codes when piping output
+
 # Heroku-provided params
 BUILD_DIR="$1"
 CACHE_DIR="$2"
