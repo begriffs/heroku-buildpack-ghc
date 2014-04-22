@@ -231,7 +231,7 @@ echo "-----> Getting newest list of cabal packages"
 cabal update
 
 echo "-----> Installing user application"
-cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared
+cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared || true
 cabal install --only-dependencies --reorder-goals
 cabal build -j
 
