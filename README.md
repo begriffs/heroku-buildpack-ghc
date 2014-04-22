@@ -22,7 +22,7 @@ machine, then do this:
 mkdir snapdemo && cd $_
 cabal sandbox init
 cabal install snap
-snap init barebones
+cabal exec snap init barebones
 
 # Tell Heroku how to start the server
 
