@@ -81,18 +81,11 @@ packages. If you have your app working locally you can constrain the
 remote package versions to match your local environment. Just do this:
 
 ```sh
-cabal install cabal-constraints
-cabal-constraints dist/dist-sandbox-*/setup-config > cabal.config
+cabal freeze
 git add cabal.config
 
 # commit and push to fix remote build
 ```
-
-Using cabal-constraints requires the Cabal version be exactly 1.18.1.2.
-This process will be improved in the Cabal 1.20 release, once
-cabal-constraints is deprecated in favor of the upcoming cabal-install
-freeze command. For more info, see the docs for
-[cabal-constraints](https://github.com/benarmston/cabal-constraints)
 
 ### Configuring the Build
 
@@ -125,12 +118,12 @@ Here are the options
 <tr>
   <td>GHC_VER</td>
   <td>GHC version to download or build</td>
-  <td>7.6.3</td>
+  <td>7.8.2</td>
 </tr>
 <tr>
   <td>CABAL_VER</td>
   <td>Version of cabal-install</td>
-  <td>1.18.0.2</td>
+  <td>1.20.0.0</td>
 </tr>
 <tr>
   <td>PREBUILT</td>
@@ -150,8 +143,8 @@ heroku run cabal repl   # Haskell repl with all app modules loaded
 
 ### Benefits of this buildpack
 
-* **Latest binaries: GHC 7.6.3, cabal-install 1.18.0.2**
-* Uses cabal >=1.18 features to run the app and repl
+* **Latest binaries: GHC 7.8.2, cabal-install 1.20.0.0**
+* Uses cabal >=1.20 features to run the app and repl
 * Exposes Haskell platform binaries to your app and scripts
 * Uses prebuilt binaries for speed but...
 * ...can fall back to building the standard GHC distribution

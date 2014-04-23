@@ -11,8 +11,8 @@ ENV_DIR="$3"
 
 # Default configuration which you can change by setting environment variables
 # e.g. heroku config:set CLEAR_CACHE=1
-GHC_VER=7.6.3
-CABAL_VER=1.18.0.2
+GHC_VER=7.8.2
+CABAL_VER=1.20.0.0
 PREBUILT=https://s3.amazonaws.com/heroku-ghc
 CLEAR_CACHE=0
 #############################################################################
@@ -91,15 +91,20 @@ function install_prebuilt_library {
   SOURCE_DIR=$4
   FLAGS=$5
   if [ ! -e $CACHE_DIR/$NAME-$VER ]; then
-    PREBUILT_LIB_URL=$PREBUILT/$NAME-VER.tar.gz # contains ghc-libs and ghc-includes directories
+    PREBUILT_LIB_URL=$PREBUILT/heroku-$NAME-$VER.tar.gz # contains ghc-libs and ghc-includes directories
     if curl --output /dev/null --silent --head --fail $PREBUILT_LIB_URL; then
-      echo "-----> Installing prebuilt $NAME-$VER"
-      curl -# -L "$PREBUILT_LIB_URL" | tar xz -C $WORKING_HOME/vendor
+      echo "-----> Installing prebuilt $NAME-$VER into cache"
+      mkdir -p $CACHE_DIR/$NAME-$VER
+      curl -# -L "$PREBUILT_LIB_URL" | tar xz -C $CACHE_DIR/$NAME-$VER
     else
       echo "-----> Could not find prebuilt $NAME-$VER"
       if [ ! -e $CACHE_DIR/download/$SOURCE_DIR ]; then
         echo "-----> Downloading $NAME"
-        curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
+        if [[ "$SOURCE_URL" =~ bz2$ ]]; then
+          curl -# -L "$SOURCE_URL" | bunzip2 | tar x -C $CACHE_DIR/download
+        else
+          curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
+        fi
       fi
       echo "-----> Installing $NAME into cache"
       mkdir -p $CACHE_DIR/$NAME-$VER/ghc-libs
@@ -129,6 +134,35 @@ function set-default-env (){
   echo "export $1=\${$1:-$2}" >> $PROFILE_PATH
 }
 
+mkdir -p $WORKING_HOME/vendor/ghc-libs
+mkdir -p $WORKING_HOME/vendor/ghc-includes
+echo "-----> Linking libncurses.so in an accessible place"
+ln -s /usr/lib/libncurses.so.5 $WORKING_HOME/vendor/ghc-libs/libtinfo.so.5
+
+LIBFFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
+install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13" "--enable-static=no"
+if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
+  echo "-----> Move libffi files into the correct locations" # See https://github.com/atgreen/libffi/issues/55 & https://github.com/atgreen/libffi/issues/24
+  rm -rf $CACHE_DIR/libffi-3.0.13/ghc-libs/*
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.so* $CACHE_DIR/libffi-3.0.13/ghc-libs/
+  mv $CACHE_DIR/libffi-3.0.13/libs/*.h $CACHE_DIR/libffi-3.0.13/ghc-includes/
+  cp $CACHE_DIR/libffi-3.0.13/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
+  cp $CACHE_DIR/libffi-3.0.13/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
+  rm -rf $CACHE_DIR/libffi-3.0.13/libs
+fi
+
+LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz"
+install_prebuilt_library "libpcre" "8.35" $LIBPCRE_URL "pcre-8.35" "--enable-silent-rules --enable-static=no --disable-cpp"
+
+LIBGMP_URL="https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2"
+install_prebuilt_library "libgmp" "6.0.0a" $LIBGMP_URL "gmp-6.0.0"
+
+export LANG=en_US.UTF-8
+export C_INCLUDE_PATH=$WORKING_HOME/vendor/ghc-includes:/usr/include:$C_INCLUDE_PATH
+export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
+export LD_LIBRARY_PATH=$LIBRARY_PATH
+export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
+
 ########## GHC #####################################################
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   PREBUILT_GHC_URL=$PREBUILT/heroku-ghc-$GHC_VER.tar.gz
@@ -138,7 +172,7 @@ if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   else
     echo "-----> Could not find prebuilt GHC $GHC_VER"
     if [ ! -e $CACHE_DIR/download/ghc-$GHC_VER ]; then
-      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux.tar.bz2"
+      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux-deb7.tar.bz2"
       echo "-----> Downloading GHC $GHC_VER"
       curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR/download
     fi
@@ -155,35 +189,8 @@ else
   cp -R $CACHE_DIR/ghc-$GHC_VER $WORKING_HOME/vendor
 fi
 
-mkdir -p $WORKING_HOME/vendor/ghc-libs
-mkdir -p $WORKING_HOME/vendor/ghc-includes
-echo "-----> Linking libgmp.so in an accessible place"
-ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
-
-#PREBUILT_LIBFFI_URL=$PREBUILT/libffi.so.6.0.1
-LIBFFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
-install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13" "--enable-static=no"
-if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
-  echo "-----> Move libffi files into the correct locations" # See https://github.com/atgreen/libffi/issues/55 & https://github.com/atgreen/libffi/issues/24
-  rm -rf $CACHE_DIR/libffi-3.0.13/ghc-libs/*
-  mv $CACHE_DIR/libffi-3.0.13/libs/*.so* $CACHE_DIR/libffi-3.0.13/ghc-libs/
-  mv $CACHE_DIR/libffi-3.0.13/libs/*.h $CACHE_DIR/libffi-3.0.13/ghc-includes/
-  cp $CACHE_DIR/libffi-3.0.13/ghc-libs/* $WORKING_HOME/vendor/ghc-libs/
-  cp $CACHE_DIR/libffi-3.0.13/ghc-includes/* $WORKING_HOME/vendor/ghc-includes/
-  rm -rf $CACHE_DIR/libffi-3.0.13/libs
-fi
-
-LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz"
-install_prebuilt_library "libpcre" "8.35" $LIBPCRE_URL "pcre-8.35" "--enable-silent-rules --enable-static=no --disable-cpp"
-
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
-
-export LANG=en_US.UTF-8
-export C_INCLUDE_PATH=$WORKING_HOME/vendor/ghc-includes:/usr/include:$C_INCLUDE_PATH
-export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
-export LD_LIBRARY_PATH=$LIBRARY_PATH
-export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
 
 ########## cabal-install ###########################################
 if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
@@ -253,6 +260,7 @@ cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-includes $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
 
