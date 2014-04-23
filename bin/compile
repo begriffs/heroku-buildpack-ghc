@@ -143,7 +143,7 @@ if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   else
     echo "-----> Could not find prebuilt GHC $GHC_VER"
     if [ ! -e $CACHE_DIR/download/ghc-$GHC_VER ]; then
-      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux.tar.bz2"
+      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux-deb7.tar.bz2"
       echo "-----> Downloading GHC $GHC_VER"
       curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR/download
     fi
