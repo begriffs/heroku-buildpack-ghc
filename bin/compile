@@ -99,7 +99,11 @@ function install_prebuilt_library {
       echo "-----> Could not find prebuilt $NAME-$VER"
       if [ ! -e $CACHE_DIR/download/$SOURCE_DIR ]; then
         echo "-----> Downloading $NAME"
-        curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
+        if [[ "$SOURCE_URL" =~ bz2$ ]]; then
+          curl -# -L "$SOURCE_URL" | bunzip2 | tar x -C $CACHE_DIR/download
+        else
+          curl -# -L "$SOURCE_URL" | tar xz -C $CACHE_DIR/download
+        fi
       fi
       echo "-----> Installing $NAME into cache"
       mkdir -p $CACHE_DIR/$NAME-$VER/ghc-libs
@@ -157,10 +161,9 @@ fi
 
 mkdir -p $WORKING_HOME/vendor/ghc-libs
 mkdir -p $WORKING_HOME/vendor/ghc-includes
-echo "-----> Linking libgmp.so in an accessible place"
-ln -s /usr/lib/libgmp.so.3 $WORKING_HOME/vendor/ghc-libs/libgmp.so
+echo "-----> Linking libncurses.so in an accessible place"
+ln -s /usr/lib/libncurses.so.5 $WORKING_HOME/vendor/ghc-libs/libtinfo.so.5
 
-#PREBUILT_LIBFFI_URL=$PREBUILT/libffi.so.6.0.1
 LIBFFI_URL="ftp://sourceware.org/pub/libffi/libffi-3.0.13.tar.gz"
 install_prebuilt_library "libffi" "3.0.13" $LIBFFI_URL "libffi-3.0.13" "--enable-static=no"
 if [ -e $CACHE_DIR/libffi-3.0.13/libs ]; then
@@ -175,6 +178,9 @@ fi
 
 LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz"
 install_prebuilt_library "libpcre" "8.35" $LIBPCRE_URL "pcre-8.35" "--enable-silent-rules --enable-static=no --disable-cpp"
+
+LIBGMP_URL="https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2"
+install_prebuilt_library "libgmp" "6.0.0a" $LIBGMP_URL "gmp-6.0.0"
 
 install_prebuilt "happy" "1.19.2"
 install_prebuilt "alex" "3.1.3"
