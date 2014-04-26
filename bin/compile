@@ -58,29 +58,24 @@ mkdir -p $WORKING_HOME/vendor
 mkdir -p $(dirname $PROFILE_PATH)
 
 function install_prebuilt {
-  BINARY=$1
+  PKG=$1
   VER=$2
 
-  if [ ! -e $CACHE_DIR/$BINARY ]; then
-    BINARY_URL=$PREBUILT/heroku-$BINARY-$VER.gz
-    if curl --output /dev/null --silent --head --fail $BINARY_URL; then
-      echo "-----> Installing prebuilt $BINARY binary"
-      curl -# -L $BINARY_URL | gunzip -c > $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY
-      chmod a+x $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY
+  if [ ! -e $CACHE_DIR/$PKG ]; then
+    PKG_URL=$PREBUILT/heroku-$PKG-$VER.tar.gz
+    if curl --output /dev/null --silent --head --fail $PKG_URL; then
+      echo "-----> Downloading and caching prebuilt $PKG binaries and shared data"
+      mkdir -p $CACHE_DIR/$PKG
+      curl -# -L $PKG_URL | tar xz -C $CACHE_DIR/$PKG
 
-      echo "-----> Installing prebuilt $BINARY shared scripts"
-      curl -# -L $PREBUILT/heroku-share-$BINARY-$VER.tar.gz | tar xz -C $WORKING_HOME/vendor/ghc-$GHC_VER/share
-
-      echo "-----> Caching $BINARY"
-      cp $WORKING_HOME/vendor/ghc-$GHC_VER/bin/$BINARY $CACHE_DIR
-      cp -R $WORKING_HOME/vendor/ghc-$GHC_VER/share/$BINARY-$VER $CACHE_DIR
+      echo "-----> Installing $PKG"
+      cp -R $CACHE_DIR/$PKG/. $WORKING_HOME/vendor/ghc-utils
     else
-      echo "-----> Could not find prebuilt $BINARY $VER (you may have problems later)"
+      echo "-----> Could not find prebuilt $PKG $VER (you may have problems later)"
     fi
   else
-    echo "-----> Restoring cached $BINARY"
-    cp $CACHE_DIR/$BINARY $WORKING_HOME/vendor/ghc-$GHC_VER/bin
-    cp -R $CACHE_DIR/$BINARY-$VER $WORKING_HOME/vendor/ghc-$GHC_VER/share
+    echo "-----> Restoring cached $PKG"
+    cp -R $CACHE_DIR/$PKG/. $WORKING_HOME/vendor/ghc-utils
   fi
 }
 
@@ -135,6 +130,7 @@ function set-default-env (){
 }
 
 mkdir -p $WORKING_HOME/vendor/ghc-libs
+mkdir -p $WORKING_HOME/vendor/ghc-utils
 mkdir -p $WORKING_HOME/vendor/ghc-includes
 echo "-----> Linking libncurses.so in an accessible place"
 ln -s /usr/lib/libncurses.so.5 $WORKING_HOME/vendor/ghc-libs/libtinfo.so.5
@@ -189,7 +185,7 @@ else
   cp -R $CACHE_DIR/ghc-$GHC_VER $WORKING_HOME/vendor
 fi
 
-install_prebuilt "happy" "1.19.2"
+install_prebuilt "happy" "1.19.3"
 install_prebuilt "alex" "3.1.3"
 
 ########## cabal-install ###########################################
@@ -243,7 +239,7 @@ cabal install --only-dependencies --reorder-goals
 cabal build -j
 
 # Set context environment variables.
-set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/cabal-install-$CABAL_VER/bin:$PATH"
+set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/ghc-utils/bin:/app/vendor/cabal-install-$CABAL_VER/bin:$PATH"
 
 set-default-env LANG en_US.UTF-8
 set-default-env C_INCLUDE_PATH /app/vendor/ghc-includes:/usr/include
@@ -260,6 +256,7 @@ cp -R $WORKING_HOME/.cabal-sandbox $CACHE_DIR
 echo "-----> Making GHC binaries available to Heroku command line"
 mkdir -p $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-libs $BUILD_DIR/vendor
+mv $WORKING_HOME/vendor/ghc-utils $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-includes $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/ghc-$GHC_VER $BUILD_DIR/vendor
 mv $WORKING_HOME/vendor/cabal-install-$CABAL_VER $BUILD_DIR/vendor
