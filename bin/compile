@@ -157,7 +157,7 @@ export LANG=en_US.UTF-8
 export C_INCLUDE_PATH=$WORKING_HOME/vendor/ghc-includes:/usr/include:$C_INCLUDE_PATH
 export LIBRARY_PATH=$WORKING_HOME/vendor/ghc-libs:/usr/lib:$LIBRARY_PATH
 export LD_LIBRARY_PATH=$LIBRARY_PATH
-export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
+export PATH=$WORKING_HOME/vendor/ghc-$GHC_VER/bin:$WORKING_HOME/vendor/cabal-install-$CABAL_VER/bin:$WORKING_HOME/vendor/ghc-utils/bin:$WORKING_HOME/.cabal-sandbox/bin:$PATH
 
 ########## GHC #####################################################
 if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
