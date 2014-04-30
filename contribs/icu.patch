@@ -1,22 +1,13 @@
-From fa56a56f5b6efc470381c6d0d8d1d9b499f7cac8 Mon Sep 17 00:00:00 2001
-From: Eric Easley <escalier@riseup.net>
-Date: Sun, 2 Mar 2014 00:04:56 -0500
-Subject: [PATCH] Add ICU external dependency; satisfies at least text-icu.
-
-
-diff --git bin/compile bin/compile
-index d59d611..53e0442 100755
+diff --git a/bin/compile b/bin/compile
+index d92bd73..412208b 100755
 --- bin/compile
 +++ bin/compile
-@@ -163,6 +163,8 @@ fi
+@@ -150,6 +150,9 @@ fi
+ LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.35/pcre-8.35.tar.gz"
+ install_prebuilt_library "libpcre" "8.35" $LIBPCRE_URL "pcre-8.35" "--enable-silent-rules --enable-static=no --disable-cpp"
  
- LIBPCRE_URL="http://iweb.dl.sourceforge.net/project/pcre/pcre/8.34/pcre-8.34.tar.gz"
- install_prebuilt_library "libpcre" "8.34" $LIBPCRE_URL "pcre-8.34" "--enable-silent-rules --enable-static=no --disable-cpp"
 +LIBICU_URL="http://download.icu-project.org/files/icu4c/52.1/icu4c-52_1-src.tgz"
 +install_prebuilt_library "libicu" "52.1" $LIBICU_URL "icu/source"
- 
- install_prebuilt "happy" "1.19.2"
- install_prebuilt "alex" "3.1.3"
--- 
-1.9.1
-
++
+ LIBGMP_URL="https://gmplib.org/download/gmp/gmp-6.0.0a.tar.bz2"
+ install_prebuilt_library "libgmp" "6.0.0a" $LIBGMP_URL "gmp-6.0.0"
