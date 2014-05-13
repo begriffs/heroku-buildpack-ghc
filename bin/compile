@@ -30,6 +30,7 @@ export_env_dir() {
       export "$e=$(cat $env_dir/$e)"
       :
     done
+    export "PATH=$(cat $env_dir/PATH):$PATH"
   fi
 }
 
