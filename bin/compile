@@ -187,6 +187,7 @@ fi
 
 install_prebuilt "happy" "1.19.3"
 install_prebuilt "alex" "3.1.3"
+install_prebuilt "cpphs" "1.18.4"
 
 ########## cabal-install ###########################################
 if [ ! -e $CACHE_DIR/cabal-install-$CABAL_VER ]; then
