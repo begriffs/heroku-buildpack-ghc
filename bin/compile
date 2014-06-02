@@ -234,9 +234,14 @@ fi
 echo "-----> Getting newest list of cabal packages"
 cabal update
 
-echo "-----> Installing user application"
+echo "-----> Installing sandbox dependencies"
 cabal configure --disable-library-profiling --disable-executable-profiling --disable-shared || true
 cabal install --only-dependencies --reorder-goals
+
+echo "-----> Delete unnecessary files from sandbox"
+find $WORKING_HOME/.cabal-sandbox -name "*.dyn_hi" -type f -delete
+
+echo "-----> Installing user application"
 cabal build -j
 
 # Set context environment variables.
