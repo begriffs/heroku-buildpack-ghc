@@ -24,7 +24,8 @@ export_env_dir() {
 
   if [ -d "$env_dir" ]; then
     echo "-----> Exporting config vars"
-    for e in $(ls "$env_dir"); do
+    for ee in $env_dir/*; do
+      e="$(basename "$ee")"
       echo "$e" | grep -E "$whitelist_regex" | grep -qvE "$blacklist_regex" &&
       echo "       $e" &&
       export "$e=$(cat "$env_dir/$e")"
