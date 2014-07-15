@@ -31,6 +31,7 @@ echo 'web: cabal run -- -p $PORT' > Procfile
 # Create a git repo and deploy!
 
 git init .
+echo "dist\n.cabal-sandbox\ncabal.sandbox.config" > .gitignore
 git add *
 git commit -m 'Initial commit'
 
