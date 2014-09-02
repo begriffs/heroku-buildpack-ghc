@@ -231,8 +231,20 @@ if [ -e $CACHE_DIR/.cabal-sandbox ]; then
   cp -R $CACHE_DIR/.cabal-sandbox $WORKING_HOME
 fi
 
+cabal_index="~/.cabal/packages/hackage.haskell.org/00-index.tar"
 echo "-----> Getting newest list of cabal packages"
-cabal update
+if [ -e "$cabal_index" ]; then
+    now="$(date +%s)"
+    idx_date="$(date +%s -r "$cabal_index")"
+    days="$(((now - idx_date) / 60 / 60 / 24))"
+    if [ $days -gt 1 ]; then
+        cabal update
+    else
+        echo "-----> Nevermind, it's not stale"
+    fi
+else
+    cabal update
+fi
 
 echo "-----> Installing user application"
 cabal configure --disable-library-profiling --disable-executable-profiling --disable-tests --disable-library-coverage --disable-benchmarks --enable-executable-stripping --disable-split-objs || true
