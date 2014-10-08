@@ -15,6 +15,8 @@ GHC_VER=${GHC_VER:-7.8.3}
 CABAL_VER=${CABAL_VER:-1.20.0.2}
 PREBUILT=${PREBUILT:-https://s3.amazonaws.com/heroku-ghc}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
+
+CABAL_INDEX="~/.cabal/packages/hackage.haskell.org/00-index.tar"
 #############################################################################
 
 export_env_dir() {
@@ -231,11 +233,10 @@ if [ -e $CACHE_DIR/.cabal-sandbox ]; then
   cp -R $CACHE_DIR/.cabal-sandbox $WORKING_HOME
 fi
 
-cabal_index="~/.cabal/packages/hackage.haskell.org/00-index.tar"
 echo "-----> Getting newest list of cabal packages"
-if [ -e "$cabal_index" ]; then
+if [ -e "$CABAL_INDEX" ]; then
     now="$(date +%s)"
-    idx_date="$(date +%s -r "$cabal_index")"
+    idx_date="$(date +%s -r "$CABAL_INDEX")"
     days="$(((now - idx_date) / 60 / 60 / 24))"
     if [ $days -gt 1 ]; then
         cabal update
