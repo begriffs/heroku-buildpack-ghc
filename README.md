@@ -9,6 +9,14 @@ This buildpack supports frameworks like Yesod, Snap, and Happstack with
 the latest stable GHC binaries. Putting Haskell web applications online
 should be easy, and now it is. Try it for yourself.
 
+<hr />
+**Note**, this buildpack does a basic build from scratch. For a
+faster build, try
+[mietek/haskell-on-heroku](https://github.com/mietek/haskell-on-heroku)
+which detects your project dependencies and fetches a custom pre-built
+sandbox.
+<hr />
+
 ### Example: deploying a Snap app
 
 Here's how to go from zero to "hello world" on Heroku. You'll need to
