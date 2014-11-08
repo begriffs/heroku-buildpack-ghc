@@ -139,6 +139,11 @@ Here are the options
   <td>Base url for the prebuilt binary cache</td>
   <td>https://s3.amazonaws.com/heroku-ghc</td>
 </tr>
+<tr>
+  <td>PRE_SCRIPT</td>
+  <td>Path to an executable, relative to checkout root. If present, this will be chmodded (+x) and ran before anything else.</td>
+  <td></td>
+</tr>
 </tbody>
 </table>
 
