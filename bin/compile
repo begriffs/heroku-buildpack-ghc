@@ -38,6 +38,14 @@ export_env_dir() {
 
 export_env_dir
 
+# run user pre-script
+PRE_SCRIPT_FULL="$BUILD_DIR/$PRE_SCRIPT"
+if [ -f "$PRE_SCRIPT_FULL" ]; then
+  echo "-----> Running PRE_SCRIPT: $PRE_SCRIPT"
+  chmod +x $PRE_SCRIPT_FULL
+  $PRE_SCRIPT_FULL "$BUILD_DIR" "$CACHE_DIR $ENV_DIR"
+fi
+
 WORKING_HOME=/app
 
 PROFILE_PATH="$BUILD_DIR/.profile.d/haskell.sh"
