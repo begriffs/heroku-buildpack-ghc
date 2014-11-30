@@ -72,6 +72,10 @@ function install_prebuilt {
   PKG=$1
   VER=$2
 
+  if [ -e $CACHE_DIR/$PKG -a ! -d $CACHE_DIR/$PKG ]; then
+    echo "-----> Removing mysterious package file for $PKG"
+    rm $CACHE_DIR/$PKG
+  fi
   if [ ! -e $CACHE_DIR/$PKG ]; then
     PKG_URL=$PREBUILT/heroku-$PKG-$VER.tar.gz
     if curl --output /dev/null --silent --head --fail $PKG_URL; then
