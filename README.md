@@ -43,7 +43,7 @@ echo "dist\n.cabal-sandbox\ncabal.sandbox.config" > .gitignore
 git add *
 git commit -m 'Initial commit'
 
-heroku create --stack=cedar --buildpack https://github.com/begriffs/heroku-buildpack-ghc.git
+heroku create --stack=cedar-14 --buildpack https://github.com/begriffs/heroku-buildpack-ghc.git
 git push heroku master
 ```
 
