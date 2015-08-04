@@ -266,7 +266,7 @@ cabal install --only-dependencies --reorder-goals --disable-library-profiling --
 cabal build -j
 
 # Set context environment variables.
-set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/ghc-utils/bin:/app/vendor/cabal-install-$CABAL_VER/bin:$PATH"
+set-env PATH "/app/vendor/ghc-$GHC_VER/bin:/app/vendor/ghc-utils/bin:/app/vendor/cabal-install-$CABAL_VER/bin"':$PATH'
 
 set-default-env LANG en_US.UTF-8
 set-default-env C_INCLUDE_PATH /app/vendor/ghc-includes:/usr/include
