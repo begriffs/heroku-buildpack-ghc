@@ -11,8 +11,8 @@ ENV_DIR="$3"
 
 # Default configuration which you can change by setting environment variables
 # e.g. heroku config:set CLEAR_CACHE=1
-GHC_VER=${GHC_VER:-7.8.3}
-CABAL_VER=${CABAL_VER:-1.20.0.2}
+GHC_VER=${GHC_VER:-7.10.3}
+CABAL_VER=${CABAL_VER:-1.22.8.0}
 PREBUILT=${PREBUILT:-https://s3.amazonaws.com/heroku-ghc}
 CLEAR_CACHE=${CLEAR_CACHE:-0}
 
@@ -183,7 +183,7 @@ if [ ! -e $CACHE_DIR/ghc-$GHC_VER ]; then
   else
     echo "-----> Could not find prebuilt GHC $GHC_VER"
     if [ ! -e $CACHE_DIR/download/ghc-$GHC_VER ]; then
-      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-unknown-linux-deb7.tar.bz2"
+      GHC_URL="http://www.haskell.org/ghc/dist/$GHC_VER/ghc-$GHC_VER-x86_64-deb8-linux.tar.bz2"
       echo "-----> Downloading GHC $GHC_VER"
       curl -# -L "$GHC_URL" | bunzip2 | tar x -C $CACHE_DIR/download
     fi

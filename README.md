@@ -127,12 +127,12 @@ Here are the options
 <tr>
   <td>GHC_VER</td>
   <td>GHC version to download or build</td>
-  <td>7.8.2</td>
+  <td>7.10.3</td>
 </tr>
 <tr>
   <td>CABAL_VER</td>
   <td>Version of cabal-install</td>
-  <td>1.20.0.0</td>
+  <td>1.22.8.0</td>
 </tr>
 <tr>
   <td>PREBUILT</td>
@@ -157,7 +157,7 @@ heroku run cabal repl   # Haskell repl with all app modules loaded
 
 ### Benefits of this buildpack
 
-* **Latest binaries: GHC 7.8.2, cabal-install 1.20.0.0**
+* **Latest binaries: GHC 7.10.3, cabal-install 1.22.8.0**
 * Uses cabal >=1.20 features to run the app and repl
 * Exposes Haskell platform binaries to your app and scripts
 * Uses prebuilt binaries for speed but...
