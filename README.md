@@ -224,15 +224,18 @@ heroku run bash
 
 cd /app/vendor
 
-curl -L http://softlayer-ams.dl.sourceforge.net/project/s3tools/s3cmd/1.5.0-alpha1/s3cmd-1.5.0-alpha1.tar.gz | tar zx
-s3cmd-1.5.0-alpha1/s3cmd --configure
+url "https://s3.amazonaws.com/aws-cli/awscli-bundle.zip" -o "awscli-bundle.zip"
+unzip awscli-bundle.zip
+awscli-bundle/install
+
+~/.local/lib/aws/bin/aws configure
 # ^^^ answer the configuration questions
 
 tar zcf heroku-ghc-[VERSION].tar.gz ghc-[VERSION]/
 tar zcf heroku-cabal-install-[VERSION].tar.gz cabal-install-[VERSION]/
 
-s3cmd-1.5.0-alpha1/s3cmd put heroku-ghc-[VERSION].tar.gz s3://[BUCKET]
-s3cmd-1.5.0-alpha1/s3cmd put heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
+~/.local/lib/aws/bin/aws s3 cp heroku-ghc-[VERSION].tar.gz s3://[BUCKET]
+~/.local/lib/aws/bin/aws s3 cp heroku-cabal-install-[VERSION].tar.gz s3://[BUCKET]
 ```
 
 ### Thanks
