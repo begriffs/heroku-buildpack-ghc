@@ -144,6 +144,11 @@ Here are the options
   <td>Path to an executable, relative to checkout root. If present, this will be chmodded (+x) and ran before anything else.</td>
   <td></td>
 </tr>
+<tr>
+  <td>POST_SCRIPT</td>
+  <td>Path to an executable, relative to checkout root. If present, this will be chmodded (+x) and ran after anything else.</td>
+  <td></td>
+</tr>
 </tbody>
 </table>
 
