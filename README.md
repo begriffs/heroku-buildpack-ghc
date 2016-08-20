@@ -101,10 +101,7 @@ git add cabal.config
 You can change build settings through Heroku environment variables.
 
 ```sh
-# allow the buildpack to see environment vars
-heroku labs:enable buildpack-env-arg
-
-# then set the variable of your choice
+# set the variable of your choice
 heroku config:set VARIABLE=value
 ```
 
