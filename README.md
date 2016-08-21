@@ -101,10 +101,7 @@ git add cabal.config
 You can change build settings through Heroku environment variables.
 
 ```sh
-# allow the buildpack to see environment vars
-heroku labs:enable buildpack-env-arg
-
-# then set the variable of your choice
+# set the variable of your choice
 heroku config:set VARIABLE=value
 ```
 
@@ -142,6 +139,11 @@ Here are the options
 <tr>
   <td>PRE_SCRIPT</td>
   <td>Path to an executable, relative to checkout root. If present, this will be chmodded (+x) and ran before anything else.</td>
+  <td></td>
+</tr>
+<tr>
+  <td>POST_SCRIPT</td>
+  <td>Path to an executable, relative to checkout root. If present, this will be chmodded (+x) and ran after anything else.</td>
   <td></td>
 </tr>
 </tbody>
