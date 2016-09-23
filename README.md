@@ -57,6 +57,10 @@ The first time you try to deploy a big framework like Yesod the
 compilation can take so long that Heroku cuts it off. If this happens
 fear not, you can build your app with an Anvil server.
 
+All local files will be synced to an online build server so either
+make sure your `.cabal-sandbox` and `dist` directories are small or
+use a new clone of your app repo.
+
 ```sh
 # Enable Anvil builds
 heroku plugins:install https://github.com/ddollar/heroku-anvil
