@@ -34,7 +34,7 @@ cabal exec snap init barebones
 
 # Tell Heroku how to start the server
 
-echo 'web: cabal run -- -p $PORT' > Procfile
+echo 'web: ./dist/build/myapp/myapp -p $PORT' > Procfile
 
 # Create a git repo and deploy!
 
